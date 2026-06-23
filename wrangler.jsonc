@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // Iron Forge — Cloudflare Workers deployment config
+  "name": "iron-forge",
+  "compatibility_date": "2025-06-23",
+  "compatibility_flags": ["nodejs_compat"],
+
+  // Server entry — uses our SSR wrapper (src/server.ts compiled by vite build)
+  "main": "dist/server/server.js",
+
+  // Static assets served from client build
+  "assets": {
+    "directory": "dist/client"
+  },
+
+  "observability": {
+    "enabled": true
+  }
+}
