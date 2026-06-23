@@ -1152,7 +1152,7 @@ function Plans({ onSelectPlan }: { onSelectPlan: (plan: PlanKey) => void }) {
     {
       key: "spark" as PlanKey,
       name: "Spark",
-      price: "149",
+      price: "99",
       tagline: "Comece a forjar.",
       features: ["Acesso à musculação", "Aulas em grupo", "Avaliação inicial"],
       cta: "Quero o Spark",
@@ -1161,7 +1161,7 @@ function Plans({ onSelectPlan }: { onSelectPlan: (plan: PlanKey) => void }) {
     {
       key: "forge" as PlanKey,
       name: "Forge",
-      price: "289",
+      price: "199",
       tagline: "Nosso plano mais escolhido.",
       features: [
         "Acesso 24h",
@@ -1176,7 +1176,7 @@ function Plans({ onSelectPlan }: { onSelectPlan: (plan: PlanKey) => void }) {
     {
       key: "iron" as PlanKey,
       name: "Iron",
-      price: "499",
+      price: "299",
       tagline: "Resultado máximo.",
       features: [
         "Tudo do Forge",
