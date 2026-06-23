@@ -62,9 +62,9 @@ export const siteConfig = {
 
   // Planos (texto livre — usado apenas para personalização, a landing tem seu próprio array)
   plans: {
-    spark: { name: "Spark", price: "R$ 149", period: "/mês" },
-    forge: { name: "Forge", price: "R$ 249", period: "/mês" },
-    legacy: { name: "Legacy", price: "R$ 449", period: "/mês" },
+    spark: { name: "Spark", price: "R$ 99", period: "/mês" },
+    forge: { name: "Forge", price: "R$ 199", period: "/mês" },
+    legacy: { name: "Legacy", price: "R$ 299", period: "/mês" },
   },
 
   // Analytics — deixe vazio para desabilitar
