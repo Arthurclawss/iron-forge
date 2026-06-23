@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /clientes
+Disallow: /auth
+
+Sitemap: https://ironforge.com.br/sitemap.xml
