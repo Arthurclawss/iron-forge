@@ -1,11 +1,5 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { AnimatePresence, animate, motion, useInView, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform } from "motion/react";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { cn } from "@/lib/utils";
 import {
   ArrowRight,
@@ -29,6 +23,7 @@ import {
   X,
   Youtube,
   Zap,
+  ChevronDown,
 } from "lucide-react";
 import heroImg from "@/assets/hero.jpg";
 import gallery1 from "@/assets/gallery-1.jpg";
@@ -333,10 +328,10 @@ function Hero({ prefersReducedMotion }: { prefersReducedMotion: boolean }) {
           poster={heroImg}
         >
           <source
-            src="/crie_um_video_para_uma_landing.mp4"
+            src="/iron-forge-hero-background.mp4"
             type="video/mp4"
           />
-          <img src={heroImg} className="h-full w-full object-cover" alt="" />
+          <img src={heroImg} className="h-full w-full object-cover" alt="Treinamento de força de elite na arena Iron Forge" />
         </video>
       </motion.div>
 
@@ -431,7 +426,7 @@ function Hero({ prefersReducedMotion }: { prefersReducedMotion: boolean }) {
           className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-1.5 text-[11px] uppercase tracking-[0.25em] text-white/70 backdrop-blur-md"
         >
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
-          Premium Strength Club · São Paulo
+          Premium Strength Club · Ponta Negra, Natal / RN
         </motion.div>
 
         <motion.h1
@@ -835,10 +830,15 @@ function Results() {
 function Counter({ value, suffix = "" }: { value: number; suffix?: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-40px" });
-  const [n, setN] = useState(0);
+  // Initialize with target value so crawlers see it in pure HTML
+  const [n, setN] = useState(value);
   const [done, setDone] = useState(false);
   useEffect(() => {
-    if (!inView) return;
+    if (!inView) {
+      // If not in viewport yet, reset to 0 so it animates when scrolled to
+      setN(0);
+      return;
+    }
     const start = performance.now();
     const dur = 1800;
     let raf = 0;
@@ -1365,26 +1365,24 @@ function Testimonials() {
 
 /* ───────────────────── FAQ ───────────────────── */
 function FAQ() {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
   const items = [
     {
-      q: "Posso cancelar quando quiser?",
-      a: "Sim. Todos os planos são mensais e sem fidelidade. Cancele direto no app em 1 clique.",
+      q: "Como funciona o cancelamento?",
+      a: "Todos os nossos planos recorrentes (mensalidades) podem ser cancelados a qualquer momento diretamente no seu painel ou solicitando na recepção com até 5 dias de antecedência do próximo vencimento, sem qualquer multa ou taxa de fidelidade.",
     },
     {
-      q: "Tem personal incluso?",
-      a: "Os planos Forge e Iron incluem sessões com personal CREF. O Spark oferece personal sob demanda.",
+      q: "Posso levar convidados para treinar comigo?",
+      a: "Sim! Os alunos dos planos Forge e Legacy possuem direito a convites mensais gratuitos para trazer amigos ou familiares. Alunos do plano Spark podem adquirir passes diários de convidado com tarifas especiais na recepção.",
     },
     {
-      q: "Funciona para iniciantes?",
-      a: "Totalmente. 38% dos nossos alunos nunca treinaram antes. Você recebe um onboarding 1:1 com um treinador.",
+      q: "Como funciona a avaliação com a calculadora?",
+      a: "Ao preencher seus dados na nossa calculadora de metas, nosso sistema estima o seu IMC e taxa metabólica diária (TDEE). Esses dados servem como base para o seu onboarding e são validados por um de nossos treinadores na sua primeira visita.",
     },
     {
-      q: "A academia abre nos finais de semana?",
-      a: "Abrimos das 7h às 20h aos sábados e das 8h às 14h aos domingos. Plano Forge e Iron têm acesso 24h.",
-    },
-    {
-      q: "Como funciona a semana grátis?",
-      a: "Você experimenta toda a estrutura por 7 dias, com personal e avaliação inicial. Sem cartão, sem compromisso.",
+      q: "A academia oferece estacionamento e acessibilidade?",
+      a: "Sim, dispomos de estacionamento amplo, seguro e gratuito com manobrista para alunos ativos durante todo o horário de treino. Nossa estrutura é 100% acessível, com rampas, elevadores e vestiários adaptados.",
     },
   ];
   return (
@@ -1392,20 +1390,41 @@ function FAQ() {
       <div className="mx-auto max-w-3xl px-5 md:px-8">
         <SectionTitle kicker="FAQ" title={<>Perguntas <span className="gradient-text-ember">frequentes</span></>} />
         <Reveal>
-          <Accordion type="single" collapsible className="mt-12 space-y-3">
-            {items.map((it, i) => (
-              <AccordionItem
-                key={i}
-                value={`q-${i}`}
-                className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] px-5"
-              >
-                <AccordionTrigger className="py-5 text-left text-base font-semibold text-white hover:no-underline">
-                  {it.q}
-                </AccordionTrigger>
-                <AccordionContent className="pb-5 text-white/65">{it.a}</AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
+          <div className="mt-12 space-y-3">
+            {items.map((it, i) => {
+              const isOpen = openIndex === i;
+              return (
+                <div
+                  key={i}
+                  className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] px-5"
+                >
+                  <h3>
+                    <button
+                      onClick={() => setOpenIndex(isOpen ? null : i)}
+                      aria-expanded={isOpen}
+                      className="flex w-full items-center justify-between py-5 text-left text-base font-semibold text-white cursor-pointer hover:text-primary transition-colors focus:outline-none"
+                    >
+                      <span>{it.q}</span>
+                      <ChevronDown
+                        className={cn(
+                          "h-4 w-4 shrink-0 text-white/50 transition-transform duration-300",
+                          isOpen && "rotate-180 text-primary"
+                        )}
+                      />
+                    </button>
+                  </h3>
+                  <div
+                    className={cn(
+                      "transition-all duration-300 ease-in-out overflow-hidden",
+                      isOpen ? "max-h-96 pb-5 opacity-100" : "max-h-0 opacity-0"
+                    )}
+                  >
+                    <p className="text-white/65 text-sm leading-relaxed">{it.a}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </Reveal>
       </div>
     </section>
@@ -1451,14 +1470,20 @@ function Footer() {
             Forjando físicos extraordinários desde 2019.
           </p>
           <div className="mt-5 flex gap-3">
-            {[Instagram, Youtube, MessageCircle].map((I, i) => (
+            {[
+              { Icon: Instagram, label: "Acessar o Instagram da Iron Forge", href: siteConfig.social.instagram },
+              { Icon: Youtube, label: "Acessar o canal do YouTube da Iron Forge", href: siteConfig.social.youtube },
+              { Icon: MessageCircle, label: "Falar com a Iron Forge no WhatsApp", href: buildWhatsAppUrl() }
+            ].map(({ Icon, label, href }) => (
               <a
-                key={i}
-                href="#"
-                aria-label="Rede social"
+                key={label}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={label}
                 className="grid h-9 w-9 place-items-center rounded-full border border-white/10 text-white/70 transition-colors hover:border-primary hover:text-primary"
               >
-                <I className="h-4 w-4" />
+                <Icon className="h-4 w-4" />
               </a>
             ))}
           </div>
@@ -1475,14 +1500,14 @@ function Footer() {
           <div className="text-xs uppercase tracking-[0.25em] text-white/40">Horário</div>
           <p className="mt-3 flex items-start gap-2 text-sm text-white/75">
             <Clock className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-            Seg–Sex 5h–23h · Sáb 7h–20h · Dom 8h–14h
+            {siteConfig.hours}
           </p>
         </div>
         <div>
           <div className="text-xs uppercase tracking-[0.25em] text-white/40">Contato</div>
           <p className="mt-3 flex items-start gap-2 text-sm text-white/75">
             <Phone className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-            (11) 4002-8922
+            (84) 99123-4567
           </p>
         </div>
       </div>
@@ -1793,7 +1818,7 @@ function PillarsCardStack() {
   ];
 
   return (
-    <section id="metodo" className="relative py-28 md:py-36 bg-background">
+    <section id="metodo" className="relative py-28 md:py-36 bg-background overflow-hidden">
       <div className="mx-auto max-w-7xl px-5 md:px-8">
         <SectionTitle
           kicker="Os 3 Pilares"
@@ -1801,7 +1826,8 @@ function PillarsCardStack() {
           subtitle="Resultados extraordinários exigem sinergia perfeita entre treino, alimentação e regeneração."
         />
         
-        <div className="mt-20 md:mt-28 space-y-24 md:space-y-32">
+        {/* Desktop Layout (Grid stack) */}
+        <div className="hidden md:block mt-20 md:mt-28 space-y-24 md:space-y-32">
           {cards.map((card, idx) => {
             const isEven = idx % 2 === 0;
             return (
@@ -1835,6 +1861,46 @@ function PillarsCardStack() {
               </div>
             );
           })}
+        </div>
+
+        {/* Mobile Layout (Swipeable Carousel) */}
+        <div className="block md:hidden mt-12">
+          <div className="flex overflow-x-auto snap-x snap-mandatory gap-6 scroll-smooth pb-6 -mx-5 px-5 scrollbar-none">
+            {cards.map((card, idx) => (
+              <div
+                key={idx}
+                className="w-[85vw] min-w-[280px] max-w-[340px] shrink-0 snap-center rounded-2xl border border-white/10 bg-white/[0.02] p-5 flex flex-col justify-between"
+              >
+                <div>
+                  <div className="relative aspect-[4/3] overflow-hidden rounded-xl">
+                    <img src={card.img} alt={card.title} className="h-full w-full object-cover" />
+                    <span className="absolute top-3 left-3 rounded-full bg-primary/20 border border-primary/30 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-white backdrop-blur-md">
+                      {card.tag}
+                    </span>
+                  </div>
+                  <div className="mt-4">
+                    <span className="text-[10px] uppercase tracking-[0.2em] text-primary font-bold">
+                      {card.badge}
+                    </span>
+                    <h3 className="font-display text-2xl tracking-tight text-white mt-1">
+                      {card.title}
+                    </h3>
+                    <p className="mt-3 text-xs leading-relaxed text-white/60">
+                      {card.desc}
+                    </p>
+                  </div>
+                </div>
+                <div className="mt-6 border-t border-white/5 pt-4 text-[10px] text-white/40 uppercase tracking-widest flex justify-between items-center">
+                  <span>{card.stats}</span>
+                  <span className="text-primary font-bold">0{idx + 1} / 03</span>
+                </div>
+              </div>
+            ))}
+          </div>
+          {/* Swipe indicator */}
+          <p className="text-center text-[10px] text-white/30 uppercase tracking-[0.2em] mt-3">
+            ← Arraste para ver mais pilares →
+          </p>
         </div>
       </div>
     </section>
