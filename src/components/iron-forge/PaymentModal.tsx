@@ -24,9 +24,9 @@ const PLAN_LABELS: Record<string, string> = {
 };
 
 const PLAN_PRICES: Record<string, number> = {
-  spark: 149,
-  forge: 289,
-  iron: 499,
+  spark: 99,
+  forge: 199,
+  iron: 299,
 };
 
 export type PlanKey = "spark" | "forge" | "iron";
