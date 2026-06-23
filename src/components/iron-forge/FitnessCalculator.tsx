@@ -191,7 +191,7 @@ export default function FitnessCalculator() {
                 <div className="space-y-4">
                   <h3 className="font-semibold text-lg text-white">Parâmetros Corporais</h3>
                   
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <label className="grid gap-1.5">
                       <span className="text-xs uppercase tracking-wider text-white/50">Gênero</span>
                       <select
