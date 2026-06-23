@@ -37,7 +37,6 @@ import t2 from "@/assets/t2.jpg";
 import t3 from "@/assets/t3.jpg";
 import nutritionPrep from "@/assets/nutrition_prep.png";
 import recoverySauna from "@/assets/recovery_sauna.png";
-import LeadFormSection from "./LeadFormSection";
 import FitnessCalculator from "./FitnessCalculator";
 import PaymentModal, { type PlanKey } from "./PaymentModal";
 import { siteConfig, buildWhatsAppUrl } from "../../../config/site";
@@ -89,7 +88,6 @@ export default function IronForgeLanding() {
         <FitnessCalculator />
         <Plans onSelectPlan={setSelectedPlan} />
         <Testimonials />
-        <LeadFormSection />
         <FAQ />
       </main>
       <Footer />
