@@ -15,6 +15,8 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedClientesRouteImport } from './routes/_authenticated/clientes'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as ApiPublicPaypalCreateOrderRouteImport } from './routes/api/public/paypal-create-order'
+import { Route as ApiPublicPaypalCaptureOrderRouteImport } from './routes/api/public/paypal-capture-order'
 import { Route as ApiPublicLeadsRouteImport } from './routes/api/public/leads'
 import { Route as ApiPublicDownloadLeadsRouteImport } from './routes/api/public/download-leads'
 import { Route as ApiPublicBookingsRouteImport } from './routes/api/public/bookings'
@@ -48,6 +50,18 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicPaypalCreateOrderRoute =
+  ApiPublicPaypalCreateOrderRouteImport.update({
+    id: '/api/public/paypal-create-order',
+    path: '/api/public/paypal-create-order',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicPaypalCaptureOrderRoute =
+  ApiPublicPaypalCaptureOrderRouteImport.update({
+    id: '/api/public/paypal-capture-order',
+    path: '/api/public/paypal-capture-order',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicLeadsRoute = ApiPublicLeadsRouteImport.update({
   id: '/api/public/leads',
   path: '/api/public/leads',
@@ -73,6 +87,8 @@ export interface FileRoutesByFullPath {
   '/api/public/bookings': typeof ApiPublicBookingsRoute
   '/api/public/download-leads': typeof ApiPublicDownloadLeadsRoute
   '/api/public/leads': typeof ApiPublicLeadsRoute
+  '/api/public/paypal-capture-order': typeof ApiPublicPaypalCaptureOrderRoute
+  '/api/public/paypal-create-order': typeof ApiPublicPaypalCreateOrderRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -83,6 +99,8 @@ export interface FileRoutesByTo {
   '/api/public/bookings': typeof ApiPublicBookingsRoute
   '/api/public/download-leads': typeof ApiPublicDownloadLeadsRoute
   '/api/public/leads': typeof ApiPublicLeadsRoute
+  '/api/public/paypal-capture-order': typeof ApiPublicPaypalCaptureOrderRoute
+  '/api/public/paypal-create-order': typeof ApiPublicPaypalCreateOrderRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -95,6 +113,8 @@ export interface FileRoutesById {
   '/api/public/bookings': typeof ApiPublicBookingsRoute
   '/api/public/download-leads': typeof ApiPublicDownloadLeadsRoute
   '/api/public/leads': typeof ApiPublicLeadsRoute
+  '/api/public/paypal-capture-order': typeof ApiPublicPaypalCaptureOrderRoute
+  '/api/public/paypal-create-order': typeof ApiPublicPaypalCreateOrderRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -107,6 +127,8 @@ export interface FileRouteTypes {
     | '/api/public/bookings'
     | '/api/public/download-leads'
     | '/api/public/leads'
+    | '/api/public/paypal-capture-order'
+    | '/api/public/paypal-create-order'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -117,6 +139,8 @@ export interface FileRouteTypes {
     | '/api/public/bookings'
     | '/api/public/download-leads'
     | '/api/public/leads'
+    | '/api/public/paypal-capture-order'
+    | '/api/public/paypal-create-order'
   id:
     | '__root__'
     | '/'
@@ -128,6 +152,8 @@ export interface FileRouteTypes {
     | '/api/public/bookings'
     | '/api/public/download-leads'
     | '/api/public/leads'
+    | '/api/public/paypal-capture-order'
+    | '/api/public/paypal-create-order'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -138,6 +164,8 @@ export interface RootRouteChildren {
   ApiPublicBookingsRoute: typeof ApiPublicBookingsRoute
   ApiPublicDownloadLeadsRoute: typeof ApiPublicDownloadLeadsRoute
   ApiPublicLeadsRoute: typeof ApiPublicLeadsRoute
+  ApiPublicPaypalCaptureOrderRoute: typeof ApiPublicPaypalCaptureOrderRoute
+  ApiPublicPaypalCreateOrderRoute: typeof ApiPublicPaypalCreateOrderRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -184,6 +212,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/paypal-create-order': {
+      id: '/api/public/paypal-create-order'
+      path: '/api/public/paypal-create-order'
+      fullPath: '/api/public/paypal-create-order'
+      preLoaderRoute: typeof ApiPublicPaypalCreateOrderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/paypal-capture-order': {
+      id: '/api/public/paypal-capture-order'
+      path: '/api/public/paypal-capture-order'
+      fullPath: '/api/public/paypal-capture-order'
+      preLoaderRoute: typeof ApiPublicPaypalCaptureOrderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/leads': {
       id: '/api/public/leads'
       path: '/api/public/leads'
@@ -229,6 +271,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicBookingsRoute: ApiPublicBookingsRoute,
   ApiPublicDownloadLeadsRoute: ApiPublicDownloadLeadsRoute,
   ApiPublicLeadsRoute: ApiPublicLeadsRoute,
+  ApiPublicPaypalCaptureOrderRoute: ApiPublicPaypalCaptureOrderRoute,
+  ApiPublicPaypalCreateOrderRoute: ApiPublicPaypalCreateOrderRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

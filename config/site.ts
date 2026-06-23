@@ -20,6 +20,23 @@ export const siteConfig = {
     leadMessage:
       "Olá, acabei de me cadastrar na Iron Forge e gostaria de agendar minha aula experimental.",
   },
+
+  // Pagamentos — PIX
+  pix: {
+    key: "15338617498",        // Chave PIX (CPF sem pontuação)
+    keyType: "CPF" as const,
+    name: "IRON FORGE ACADEMIA", // Nome exibido no app bancário (máx 25 chars)
+    city: "Natal",               // Cidade (máx 15 chars)
+  },
+
+  // Pagamentos — PayPal
+  // Para obter o clientId: https://developer.paypal.com → My Apps → Create App
+  paypal: {
+    // Preencha com seu Client ID do PayPal Developer Dashboard
+    // Sandbox: https://developer.paypal.com/developer/applications
+    clientId: process.env.PAYPAL_CLIENT_ID || "",
+    mode: (process.env.PAYPAL_MODE || "sandbox") as "sandbox" | "live",
+  },
   phone: "(11) 4002-8922",
   email: "contato@ironforge.com.br",
 

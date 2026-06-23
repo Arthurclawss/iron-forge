@@ -44,6 +44,7 @@ import nutritionPrep from "@/assets/nutrition_prep.png";
 import recoverySauna from "@/assets/recovery_sauna.png";
 import LeadFormSection from "./LeadFormSection";
 import FitnessCalculator from "./FitnessCalculator";
+import PaymentModal, { type PlanKey } from "./PaymentModal";
 import { siteConfig, buildWhatsAppUrl } from "../../../config/site";
 import { trackEvent } from "@/lib/analytics";
 
@@ -53,6 +54,7 @@ import { trackEvent } from "@/lib/analytics";
 
 export default function IronForgeLanding() {
   const prefersReducedMotion = useReducedMotion() ?? false;
+  const [selectedPlan, setSelectedPlan] = useState<PlanKey | null>(null);
 
   // ── Lenis smooth scroll (lazy, client only) ────────────────
   useEffect(() => {
@@ -90,7 +92,7 @@ export default function IronForgeLanding() {
         <Results />
         <Transformation />
         <FitnessCalculator />
-        <Plans />
+        <Plans onSelectPlan={setSelectedPlan} />
         <Testimonials />
         <LeadFormSection />
         <FAQ />
@@ -100,6 +102,10 @@ export default function IronForgeLanding() {
       <ExitIntentPopup />
       <SocialProofToast />
       <FloatingCTA />
+      {/* Payment modal — renders above everything */}
+      {selectedPlan && (
+        <PaymentModal plan={selectedPlan} onClose={() => setSelectedPlan(null)} />
+      )}
     </div>
   );
 }
@@ -1035,9 +1041,10 @@ function Transformation() {
 }
 
 /* ───────────────────── Plans ───────────────────── */
-function Plans() {
+function Plans({ onSelectPlan }: { onSelectPlan: (plan: PlanKey) => void }) {
   const plans = [
     {
+      key: "spark" as PlanKey,
       name: "Spark",
       price: "149",
       tagline: "Comece a forjar.",
@@ -1046,6 +1053,7 @@ function Plans() {
       featured: false,
     },
     {
+      key: "forge" as PlanKey,
       name: "Forge",
       price: "289",
       tagline: "Nosso plano mais escolhido.",
@@ -1056,10 +1064,11 @@ function Plans() {
         "Nutricionista incluso",
         "Recovery zone liberada",
       ],
-      cta: "Começar 7 dias grátis",
+      cta: "Assinar agora",
       featured: true,
     },
     {
+      key: "iron" as PlanKey,
       name: "Iron",
       price: "499",
       tagline: "Resultado máximo.",
@@ -1070,7 +1079,7 @@ function Plans() {
         "Programa nutricional 1:1",
         "Eventos VIP",
       ],
-      cta: "Falar com consultor",
+      cta: "Quero o Iron",
       featured: false,
     },
   ];
@@ -1083,9 +1092,22 @@ function Plans() {
           highlightIndexStart={3}
         />
         <p className="mx-auto mt-6 max-w-xl text-center text-pretty text-white/60">
-          Cancele quando quiser. Primeira semana grátis em todos os planos.
+          Cancele quando quiser. Pague via PIX ou PayPal/Cartão.
         </p>
-        <div className="mt-16 grid gap-6 lg:grid-cols-3">
+
+        {/* Payment methods badges */}
+        <div className="mx-auto mt-4 flex items-center justify-center gap-3 flex-wrap">
+          {["PIX", "PayPal", "Visa", "Mastercard", "Amex"].map((m) => (
+            <span
+              key={m}
+              className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-white/40"
+            >
+              {m}
+            </span>
+          ))}
+        </div>
+
+        <div className="mt-14 grid gap-6 lg:grid-cols-3">
           {plans.map((p, i) => (
             <Reveal key={p.name} delay={i * 0.08}>
               <article
@@ -1116,17 +1138,18 @@ function Plans() {
                     </li>
                   ))}
                 </ul>
-                <a
-                  href="#"
+                <button
+                  type="button"
+                  onClick={() => onSelectPlan(p.key)}
                   className={cn(
-                    "mt-10 inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition-transform hover:scale-[1.02]",
+                    "mt-auto pt-8 inline-flex items-center justify-center gap-2 rounded-full px-5 py-3.5 text-sm font-semibold transition-all hover:scale-[1.02] active:scale-[0.98]",
                     p.featured
                       ? "gradient-ember text-white ember-glow"
                       : "border border-white/15 text-white hover:bg-white/5",
                   )}
                 >
                   {p.cta} <ArrowRight className="h-3.5 w-3.5" />
-                </a>
+                </button>
               </article>
             </Reveal>
           ))}
