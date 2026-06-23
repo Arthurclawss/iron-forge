@@ -25,7 +25,13 @@ function fireConfetti() {
 
 export default function LeadForm() {
   const [submitting, setSubmitting] = useState(false);
-  const [success, setSuccess] = useState<null | { id: string | null }>(null);
+  const [success, setSuccess] = useState<null | { 
+    id: string | null;
+    name: string;
+    email: string;
+    phone: string;
+    notes?: string;
+  }>(null);
   const [serverError, setServerError] = useState<string | null>(null);
 
   const {
@@ -67,7 +73,13 @@ export default function LeadForm() {
         setServerError(json.error ?? "Não foi possível enviar. Tente novamente.");
         return;
       }
-      setSuccess({ id: json.leadId ?? null });
+      setSuccess({ 
+        id: json.leadId ?? null,
+        name: values.name,
+        email: values.email,
+        phone: values.phone,
+        notes: values.notes
+      });
       trackEvent("lead_success", { leadId: json.leadId });
       fireConfetti();
     } catch (e) {
@@ -79,7 +91,15 @@ export default function LeadForm() {
   };
 
   if (success) {
-    return <SuccessScreen leadId={success.id} />;
+    return (
+      <SuccessScreen 
+        leadId={success.id} 
+        leadName={success.name}
+        leadEmail={success.email}
+        leadPhone={success.phone}
+        leadNotes={success.notes}
+      />
+    );
   }
 
   return (
@@ -241,216 +261,48 @@ function inputCls(hasError: boolean) {
   ].join(" ");
 }
 
-function SuccessScreen({ leadId }: { leadId: string | null }) {
-  const [bookingDate, setBookingDate] = useState<Date | null>(null);
-  const [bookingTime, setBookingTime] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [booked, setBooked] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+function SuccessScreen({ 
+  leadName,
+}: { 
+  leadId: string | null;
+  leadName: string;
+  leadEmail: string;
+  leadPhone: string;
+  leadNotes?: string;
+}) {
+  const whatsAppUrl = buildWhatsAppUrl(`Olá! Acabei de me cadastrar no site. Meu nome é ${leadName}. Gostaria de agendar minha aula experimental com a IA!`);
 
-  const whatsAppUrl = buildWhatsAppUrl();
-
-  const getNextDays = () => {
-    const days = [];
-    const today = new Date();
-    for (let i = 1; i <= 7; i++) {
-      const d = new Date(today);
-      d.setDate(today.getDate() + i);
-      if (d.getDay() !== 0) { // Excluir domingo
-        days.push(d);
-      }
-    }
-    return days;
-  };
-
-  const timeSlots = ["08:00", "10:00", "14:00", "16:00", "18:00", "20:00"];
-
-  const handleBook = async () => {
-    if (!leadId || !bookingDate || !bookingTime) return;
-    setLoading(true);
-    setError(null);
-
-    const [hour, minute] = bookingTime.split(":");
-    const finalDateTime = new Date(bookingDate);
-    finalDateTime.setHours(Number(hour), Number(minute), 0, 0);
-
-    try {
-      const res = await fetch("/api/public/bookings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          leadId,
-          bookingTime: finalDateTime.toISOString(),
-        }),
-      });
-
-      const json = await res.json().catch(() => ({}));
-      if (!res.ok || !json.ok) {
-        setError(json.error ?? "Não foi possível realizar o agendamento.");
-        return;
-      }
-
-      setBooked(true);
-      trackEvent("whatsapp_click", { from: "booking_success" });
-    } catch (e) {
-      setError("Falha de conexão. Tente novamente.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const getGoogleCalUrl = () => {
-    if (!bookingDate || !bookingTime) return "#";
-    const [hour, minute] = bookingTime.split(":");
-    const start = new Date(bookingDate);
-    start.setHours(Number(hour), Number(minute), 0, 0);
-    const end = new Date(start.getTime() + 60 * 60 * 1000); // 1h treino
-
-    const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
-    return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=Aula+Experimental+Iron+Forge&dates=${fmt(start)}/${fmt(end)}&details=Sua+aula+experimental+na+Iron+Forge+Premium+Strength+Club.&location=Av.+Paulista,+1.800+-+Bela+Vista+-+São+Paulo`;
-  };
-
-  if (booked && bookingDate && bookingTime) {
-    const dateFormatted = bookingDate.toLocaleDateString("pt-BR", {
-      weekday: "long",
-      day: "2-digit",
-      month: "2-digit",
-    });
-
-    return (
-      <motion.div
-        initial={{ opacity: 0, y: 14 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="grid place-items-center gap-5 p-4 text-center"
-      >
-        <div className="grid h-16 w-16 place-items-center rounded-full gradient-ember ember-glow">
-          <CheckCircle2 className="h-8 w-8 text-white" />
-        </div>
-        <div>
-          <h3 className="font-display text-2xl tracking-tight text-white">Aula Agendada!</h3>
-          <p className="mx-auto mt-2 max-w-sm text-sm text-white/65">
-            Seu treino foi agendado para <strong className="text-primary">{dateFormatted} às {bookingTime}</strong>.
-          </p>
-        </div>
-
-        <div className="flex flex-col gap-2.5 w-full mt-2">
-          <a
-            href={getGoogleCalUrl()}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 py-3 text-xs font-semibold text-white hover:bg-white/10"
-          >
-            🗓️ Adicionar ao Google Calendar
-          </a>
-          <a
-            href={whatsAppUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-[#25D366] px-6 py-3 text-sm font-semibold text-black shadow-lg shadow-emerald-500/20 transition-transform hover:-translate-y-0.5"
-          >
-            <MessageCircle className="h-4 w-4" /> Entrar no Grupo de Alunos
-          </a>
-        </div>
-      </motion.div>
-    );
-  }
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      window.location.href = whatsAppUrl;
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [whatsAppUrl]);
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
-      className="grid gap-5 p-2 text-left"
+      className="grid place-items-center gap-5 p-6 text-center"
     >
-      <div className="text-center">
+      <div className="grid h-16 w-16 place-items-center rounded-full gradient-ember ember-glow">
+        <CheckCircle2 className="h-8 w-8 text-white" />
+      </div>
+      <div>
         <h3 className="font-display text-2xl tracking-tight text-white">Cadastro Recebido! 🎉</h3>
-        <p className="mt-1 text-xs text-white/50">
-          Garanta o seu horário reservando sua aula experimental abaixo:
+        <p className="mx-auto mt-2 max-w-sm text-sm text-white/65">
+          Olá <strong>{leadName}</strong>, seu cadastro foi registrado com sucesso.
+        </p>
+        <p className="mx-auto mt-4 max-w-sm text-xs text-primary animate-pulse font-semibold">
+          Redirecionando para o WhatsApp em instantes para agendar seu treino com nossa IA...
         </p>
       </div>
-
-      <div>
-        <span className="text-[10px] uppercase tracking-wider text-white/40 block mb-2">1. Selecione o dia</span>
-        <div className="flex gap-2 overflow-x-auto pb-1.5 scrollbar-thin">
-          {getNextDays().map((day) => {
-            const isSelected = bookingDate?.toDateString() === day.toDateString();
-            const label = day.toLocaleDateString("pt-BR", { weekday: "short" });
-            const num = day.getDate();
-            return (
-              <button
-                key={day.toDateString()}
-                type="button"
-                onClick={() => setBookingDate(day)}
-                className={`rounded-lg border px-3 py-2 text-center transition-all shrink-0 min-w-[65px] ${
-                  isSelected
-                    ? "border-primary bg-primary/10 text-primary"
-                    : "border-white/10 text-white/60 hover:border-white/20"
-                }`}
-              >
-                <div className="text-[9px] uppercase tracking-widest">{label}</div>
-                <div className="text-sm font-bold mt-0.5">{num}</div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {bookingDate && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: "auto" }}
-        >
-          <span className="text-[10px] uppercase tracking-wider text-white/40 block mb-2">2. Selecione o Horário</span>
-          <div className="grid grid-cols-3 gap-2">
-            {timeSlots.map((time) => {
-              const isSelected = bookingTime === time;
-              return (
-                <button
-                  key={time}
-                  type="button"
-                  onClick={() => setBookingTime(time)}
-                  className={`rounded-lg border py-2 text-xs font-semibold transition-all ${
-                    isSelected
-                      ? "border-primary bg-primary/10 text-primary"
-                      : "border-white/10 text-white/60 hover:border-white/20"
-                  }`}
-                >
-                  {time}
-                </button>
-              );
-            })}
-          </div>
-        </motion.div>
-      )}
-
-      {error && <p className="text-xs text-red-400 text-center">{error}</p>}
-
-      {leadId && bookingDate && bookingTime ? (
-        <button
-          type="button"
-          onClick={handleBook}
-          disabled={loading}
-          className="mt-2 flex w-full items-center justify-center gap-2 rounded-full gradient-ember py-3.5 text-xs font-semibold text-white hover:scale-[1.01] transition-transform disabled:opacity-50"
-        >
-          {loading ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin" /> Reservando...
-            </>
-          ) : (
-            <>
-              Confirmar Agendamento de Aula
-            </>
-          )}
-        </button>
-      ) : (
-        <a
-          href={whatsAppUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 flex w-full items-center justify-center gap-2 rounded-full bg-white/5 border border-white/10 py-3 text-xs font-semibold text-white/70 hover:text-white"
-        >
-          Pular e Falar no WhatsApp
-        </a>
-      )}
+      <a
+        href={whatsAppUrl}
+        className="mt-2 inline-flex items-center justify-center gap-2 rounded-full bg-[#25D366] px-8 py-3.5 text-sm font-semibold text-black shadow-lg shadow-emerald-500/20 transition-all hover:scale-[1.01]"
+      >
+        <MessageCircle className="h-4 w-4" /> Falar com a IA no WhatsApp Agora
+      </a>
     </motion.div>
   );
 }

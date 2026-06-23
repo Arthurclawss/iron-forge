@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion, useInView, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform } from "motion/react";
+import { AnimatePresence, animate, motion, useInView, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform } from "motion/react";
 import {
   Accordion,
   AccordionContent,
@@ -40,6 +40,8 @@ import afterImg from "@/assets/after.jpg";
 import t1 from "@/assets/t1.jpg";
 import t2 from "@/assets/t2.jpg";
 import t3 from "@/assets/t3.jpg";
+import nutritionPrep from "@/assets/nutrition_prep.png";
+import recoverySauna from "@/assets/recovery_sauna.png";
 import LeadFormSection from "./LeadFormSection";
 import FitnessCalculator from "./FitnessCalculator";
 import { siteConfig, buildWhatsAppUrl } from "../../../config/site";
@@ -79,9 +81,10 @@ export default function IronForgeLanding() {
       <ScrollProgress />
       <UrgencyBar />
       <Nav />
-      <main>
+      <main className="relative">
         <Hero prefersReducedMotion={prefersReducedMotion} />
         <TrustBadges />
+        <PillarsCardStack />
         <Benefits />
         <Gallery />
         <Results />
@@ -273,6 +276,14 @@ function Hero({ prefersReducedMotion }: { prefersReducedMotion: boolean }) {
   const heroY = useTransform(scrollYProgress, [0, 1], [0, 120]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.9], [1, 0]);
 
+  // scroll parallax for floating elements
+  const imgLeftScrollY = useTransform(scrollYProgress, [0, 1], [0, -220]);
+  const imgRightScrollY = useTransform(scrollYProgress, [0, 1], [0, -320]);
+  const imgLeftMouseX = useTransform(smx, [-1, 1], [-25, 25]);
+  const imgLeftMouseY = useTransform(smy, [-1, 1], [-20, 20]);
+  const imgRightMouseX = useTransform(smx, [-1, 1], [25, -25]);
+  const imgRightMouseY = useTransform(smy, [-1, 1], [20, -20]);
+
   useEffect(() => {
     if (prefersReducedMotion) return;
     const el = ref.current;
@@ -316,12 +327,56 @@ function Hero({ prefersReducedMotion }: { prefersReducedMotion: boolean }) {
           poster={heroImg}
         >
           <source
-            src="https://player.vimeo.com/external/435674703.sd.mp4?s=7fdfafb69e38e6e580e55b4e3e3b3b44b80b7e28&profile_id=165&oauth2_token_id=57447761"
+            src="/crie_um_video_para_uma_landing.mp4"
             type="video/mp4"
           />
           <img src={heroImg} className="h-full w-full object-cover" alt="" />
         </video>
       </motion.div>
+
+      {/* Floating Left Parallax Card */}
+      {!prefersReducedMotion && (
+        <motion.div
+          className="absolute left-[4%] top-[30%] z-20 hidden xl:block pointer-events-none"
+          style={{ y: imgLeftScrollY }}
+        >
+          <motion.div
+            className="w-56 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-1.5 shadow-2xl backdrop-blur-md pointer-events-auto select-none"
+            style={{ x: imgLeftMouseX, y: imgLeftMouseY, rotate: -4 }}
+            whileHover={{ scale: 1.05, rotate: -1, transition: { duration: 0.3 } }}
+          >
+            <div className="relative aspect-[4/5] overflow-hidden rounded-xl">
+              <img src={gallery1} alt="Treino Foco" className="h-full w-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              <span className="absolute bottom-3 left-3 rounded-full bg-primary/20 border border-primary/30 px-2.5 py-0.5 text-[9px] uppercase tracking-[0.2em] text-white backdrop-blur-md font-semibold">
+                Treino de Elite
+              </span>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+
+      {/* Floating Right Parallax Card */}
+      {!prefersReducedMotion && (
+        <motion.div
+          className="absolute right-[4%] top-[20%] z-20 hidden lg:block pointer-events-none"
+          style={{ y: imgRightScrollY }}
+        >
+          <motion.div
+            className="w-52 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-1.5 shadow-2xl backdrop-blur-md pointer-events-auto select-none"
+            style={{ x: imgRightMouseX, y: imgRightMouseY, rotate: 6 }}
+            whileHover={{ scale: 1.05, rotate: 2, transition: { duration: 0.3 } }}
+          >
+            <div className="relative aspect-[3/4] overflow-hidden rounded-xl">
+              <img src={gallery2} alt="Espaço Cross" className="h-full w-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              <span className="absolute bottom-3 left-3 rounded-full bg-primary/20 border border-primary/30 px-2.5 py-0.5 text-[9px] uppercase tracking-[0.2em] text-white backdrop-blur-md font-semibold">
+                Performance
+              </span>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
 
       {/* grid overlay */}
       <motion.div
@@ -555,11 +610,14 @@ function Benefits() {
   return (
     <section id="beneficios" className="relative py-28 md:py-36">
       <div className="mx-auto max-w-7xl px-5 md:px-8">
-        <SectionTitle
+        <ScrollHighlightText
           kicker="Por que Iron Forge"
-          title={<>Tudo o que uma academia <span className="gradient-text-ember">comum não tem</span></>}
-          subtitle="Cada detalhe foi desenhado para acelerar seu resultado e levar sua experiência a outro nível."
+          text="Tudo o que uma academia comum não tem"
+          highlightIndexStart={5}
         />
+        <p className="mx-auto mt-6 max-w-xl text-center text-pretty text-white/60">
+          Cada detalhe foi desenhado para acelerar seu resultado e levar sua experiência a outro nível.
+        </p>
         <div className="mt-16 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((b, i) => (
             <TiltCard key={b.title} {...b} delay={i * 0.06} />
@@ -631,23 +689,76 @@ function TiltCard({ icon: Icon, title, body, delay }: { icon: typeof Dumbbell; t
 }
 
 /* ───────────────────── Gallery (parallax) ───────────────────── */
-function Gallery() {
+function GalleryItem({ src, title, h, speed = 1 }: { src: string; title: string; h: "tall" | "short"; speed?: number }) {
   const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const y1 = useTransform(scrollYProgress, [0, 1], [60, -60]);
-  const y2 = useTransform(scrollYProgress, [0, 1], [120, -120]);
-  const y3 = useTransform(scrollYProgress, [0, 1], [40, -90]);
-  const y4 = useTransform(scrollYProgress, [0, 1], [90, -40]);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"]
+  });
+
+  const y = useTransform(scrollYProgress, [0, 1], [80 * speed, -80 * speed]);
+  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [1.02, 1.15, 1.02]);
+  const rotate = useTransform(scrollYProgress, [0, 1], [h === "tall" ? -3 : 3, h === "tall" ? 3 : -3]);
+
+  return (
+    <motion.figure
+      ref={ref}
+      style={{ y }}
+      className={cn(
+        "group relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-2xl",
+        h === "tall" ? "aspect-[3/4]" : "aspect-[4/5] md:mt-16",
+      )}
+    >
+      <motion.img
+        src={src}
+        alt={title}
+        style={{ scale, rotate }}
+        loading="lazy"
+        decoding="async"
+        className="h-full w-full object-cover transition-transform duration-[400ms] ease-out group-hover:scale-[1.22]"
+      />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/90 via-background/30 to-transparent" />
+      <span
+        aria-hidden
+        className="pointer-events-none absolute -inset-x-1/2 top-0 h-full w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-white/15 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+        style={{ animation: "shimmer-sweep 1.6s ease-out" }}
+      />
+      <figcaption className="absolute bottom-5 left-5 text-xs uppercase tracking-[0.25em] text-white/85 font-bold">
+        {title}
+      </figcaption>
+    </motion.figure>
+  );
+}
+
+function Gallery() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"]
+  });
+
+  // Background parallax movement
+  const bgY = useTransform(scrollYProgress, [0, 1], [-120, 120]);
 
   const items = [
-    { src: gallery1, y: y1, title: "Sala de musculação", h: "tall" as const },
-    { src: gallery2, y: y2, title: "Funcional & Cross", h: "short" as const },
-    { src: gallery3, y: y3, title: "Powerlifting platform", h: "short" as const },
-    { src: gallery4, y: y4, title: "Performance zone", h: "tall" as const },
+    { src: gallery1, title: "Sala de musculação", h: "tall" as const, speed: 1.2 },
+    { src: gallery2, title: "Funcional & Cross", h: "short" as const, speed: 2.4 },
+    { src: gallery3, title: "Powerlifting platform", h: "short" as const, speed: 1.8 },
+    { src: gallery4, title: "Performance zone", h: "tall" as const, speed: 0.9 },
   ];
 
   return (
-    <section id="estrutura" ref={ref} className="relative py-28 md:py-36">
+    <section ref={sectionRef} id="estrutura" className="relative py-32 md:py-44 overflow-hidden bg-background">
+      {/* Parallax Background Image */}
+      <motion.div
+        className="absolute inset-0 -z-10 bg-cover bg-center opacity-[0.06] scale-125 filter blur-[2px]"
+        style={{
+          backgroundImage: `url(${heroImg})`,
+          y: bgY
+        }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background -z-10" />
+
       <div className="mx-auto max-w-7xl px-5 md:px-8">
         <SectionTitle
           kicker="Estrutura"
@@ -655,33 +766,9 @@ function Gallery() {
           subtitle="2.800 m² projetados por arquitetos especializados em design de performance."
         />
       </div>
-      <div className="mx-auto mt-16 grid max-w-7xl grid-cols-2 gap-4 px-5 md:grid-cols-4 md:gap-6 md:px-8">
+      <div className="mx-auto mt-20 grid max-w-7xl grid-cols-2 gap-6 px-5 md:grid-cols-4 md:gap-8 md:px-8">
         {items.map((it, i) => (
-          <motion.figure
-            key={i}
-            style={{ y: it.y }}
-            className={cn(
-              "group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5",
-              it.h === "tall" ? "aspect-[3/4]" : "aspect-[4/5] md:mt-12",
-            )}
-          >
-            <img
-              src={it.src}
-              alt={it.title}
-              loading="lazy"
-              decoding="async"
-              className="h-full w-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-110"
-            />
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/80 via-background/20 to-transparent" />
-            <span
-              aria-hidden
-              className="pointer-events-none absolute -inset-x-1/2 top-0 h-full w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-white/15 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-              style={{ animation: "shimmer-sweep 1.6s ease-out" }}
-            />
-            <figcaption className="absolute bottom-4 left-4 text-xs uppercase tracking-[0.25em] text-white/80">
-              {it.title}
-            </figcaption>
-          </motion.figure>
+          <GalleryItem key={i} src={it.src} title={it.title} h={it.h} speed={it.speed} />
         ))}
       </div>
     </section>
@@ -799,25 +886,51 @@ function Bar({ label, pct, delay = 0 }: { label: string; pct: number; delay?: nu
 
 /* ───────────────────── Transformation (before/after) ───────────────────── */
 function Transformation() {
-  const ref = useRef<HTMLDivElement>(null);
-  const [pos, setPos] = useState(55);
-  const dragging = useRef(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  
+  const mx = useMotionValue(50);
+  const my = useMotionValue(50);
+  const rad = useMotionValue(140);
+  
+  const smx = useSpring(mx, { stiffness: 150, damping: 25 });
+  const smy = useSpring(my, { stiffness: 150, damping: 25 });
+  const srad = useSpring(rad, { stiffness: 150, damping: 25 });
+
+  const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
-    const up = () => (dragging.current = false);
-    const move = (e: PointerEvent) => {
-      if (!dragging.current || !ref.current) return;
-      const r = ref.current.getBoundingClientRect();
-      const x = ((e.clientX - r.left) / r.width) * 100;
-      setPos(Math.max(2, Math.min(98, x)));
-    };
-    window.addEventListener("pointerup", up);
-    window.addEventListener("pointermove", move);
-    return () => {
-      window.removeEventListener("pointerup", up);
-      window.removeEventListener("pointermove", move);
-    };
-  }, []);
+    rad.set(isHovered ? 200 : 140);
+  }, [isHovered, rad]);
+
+  const clipPath = useTransform(
+    [smx, smy, srad] as never,
+    ([x, y, r]: number[]) => `circle(${r}px at ${x}% ${y}%)`
+  );
+
+  const spotlightX = useTransform(smx, (x) => `${x}%`);
+  const spotlightY = useTransform(smy, (y) => `${y}%`);
+  const spotlightW = useTransform(srad, (r) => `${r * 2}px`);
+  const spotlightH = useTransform(srad, (r) => `${r * 2}px`);
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    mx.set(x);
+    my.set(y);
+  };
+
+  const handlePointerEnter = () => {
+    setIsHovered(true);
+  };
+
+  const handlePointerLeave = () => {
+    setIsHovered(false);
+    mx.set(50);
+    my.set(50);
+  };
 
   return (
     <section className="relative py-28 md:py-36">
@@ -830,33 +943,91 @@ function Transformation() {
 
         <Reveal>
           <div
-            ref={ref}
-            className="relative mx-auto mt-14 aspect-[4/3] max-w-4xl overflow-hidden rounded-3xl border border-white/10 bg-black select-none md:aspect-[16/9]"
-            onPointerDown={(e) => {
-              dragging.current = true;
-              const r = e.currentTarget.getBoundingClientRect();
-              setPos(Math.max(2, Math.min(98, ((e.clientX - r.left) / r.width) * 100)));
-            }}
+            ref={containerRef}
+            className="relative mx-auto mt-14 aspect-[4/3] max-w-5xl overflow-hidden rounded-3xl border border-white/10 bg-[oklch(0.06_0.005_20)] select-none md:aspect-[16/9] cursor-none"
+            onPointerMove={handlePointerMove}
+            onPointerEnter={handlePointerEnter}
+            onPointerLeave={handlePointerLeave}
           >
-            <img src={afterImg} alt="Depois da transformação" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
-            <div className="absolute inset-0 overflow-hidden" style={{ clipPath: `polygon(0 0, ${pos}% 0, ${pos}% 100%, 0 100%)` }}>
-              <img src={beforeImg} alt="Antes da transformação" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
-            </div>
-            <span className="absolute left-4 top-4 rounded-full bg-black/60 px-3 py-1 text-[11px] uppercase tracking-[0.25em] text-white/80 backdrop-blur">Antes</span>
-            <span className="absolute right-4 top-4 rounded-full gradient-ember px-3 py-1 text-[11px] uppercase tracking-[0.25em] text-white">Depois</span>
-            <div
-              className="pointer-events-none absolute inset-y-0 z-10 w-[2px] gradient-ember"
-              style={{ left: `calc(${pos}% - 1px)` }}
+            {/* The BEFORE image is the base background */}
+            <img 
+              src={beforeImg} 
+              alt="Antes da transformação" 
+              loading="lazy" 
+              className="absolute inset-0 h-full w-full object-cover" 
+            />
+            
+            {/* The AFTER image is the revealed spotlight */}
+            <motion.div 
+              className="absolute inset-0 overflow-hidden" 
+              style={{ clipPath }}
             >
-              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white/80 bg-background/70 p-3 ember-glow backdrop-blur">
-                <div className="flex gap-1">
-                  <ArrowRight className="h-4 w-4 -scale-x-100 text-white" />
-                  <ArrowRight className="h-4 w-4 text-white" />
-                </div>
-              </div>
+              <img 
+                src={afterImg} 
+                alt="Depois da transformação" 
+                loading="lazy" 
+                className="absolute inset-0 h-full w-full object-cover" 
+              />
+            </motion.div>
+
+            {/* Static labels */}
+            <div className="absolute left-6 top-6 z-20 pointer-events-none rounded-full bg-black/75 border border-white/10 px-4 py-1.5 text-[11px] uppercase tracking-[0.25em] text-white/70 backdrop-blur-md font-semibold">
+              Antes
             </div>
+            <div className="absolute right-6 top-6 z-20 pointer-events-none rounded-full gradient-ember px-4 py-1.5 text-[11px] uppercase tracking-[0.25em] text-white font-semibold shadow-lg shadow-primary/20">
+              Depois
+            </div>
+
+            {/* Pulsing Hint Overlay - Center indicator visible when not hovering */}
+            <AnimatePresence>
+              {!isHovered && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="absolute inset-0 z-20 flex flex-col items-center justify-center pointer-events-none bg-black/30 backdrop-blur-[1px]"
+                >
+                  <div className="relative flex items-center justify-center w-28 h-28">
+                    <div className="absolute inset-0 rounded-full border-2 border-white/80 animate-ping opacity-25" />
+                    <div className="absolute inset-2 rounded-full border border-primary/60 animate-pulse bg-primary/10" />
+                    <div className="absolute inset-4 rounded-full border border-white/20 bg-background/50 flex items-center justify-center text-white font-semibold font-display text-xs">
+                      Revelar
+                    </div>
+                  </div>
+                  <p className="mt-4 font-display text-xs tracking-widest text-white/90 uppercase bg-black/60 px-4 py-2 rounded-full border border-white/10 backdrop-blur">
+                    Passe o mouse
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Custom Interactive Cursor (Spotlight Border) */}
+            {isHovered && (
+              <motion.div
+                className="pointer-events-none absolute z-30 -translate-x-1/2 -translate-y-1/2 rounded-full border border-primary/50 bg-transparent shadow-[0_0_40px_rgba(255,77,46,0.3)]"
+                style={{
+                  left: spotlightX,
+                  top: spotlightY,
+                  width: spotlightW,
+                  height: spotlightH,
+                }}
+              />
+            )}
+            
+            <div ref={cardRef} className="absolute inset-0 pointer-events-none" />
           </div>
-          <p className="mt-4 text-center text-xs text-white/50">Arraste a linha para comparar</p>
+          
+          <p className="mt-6 text-center text-xs text-white/40 font-medium">
+            Mova o cursor sobre a imagem para revelar o físico transformado
+          </p>
+
+          {/* Animated Metrics */}
+          <div className="grid grid-cols-3 gap-4 max-w-2xl mx-auto mt-10">
+            <MetricCircle label="Gordura Corporal" fromVal="24%" toVal="12%" pct={50} delay={0.1} />
+            <MetricCircle label="Peso Corporal" fromVal="96 kg" toVal="78 kg" pct={81} delay={0.2} />
+            <MetricCircle label="Massa Magra" fromVal="38%" toVal="42.5%" pct={90} delay={0.3} />
+          </div>
         </Reveal>
       </div>
     </section>
@@ -906,11 +1077,14 @@ function Plans() {
   return (
     <section id="planos" className="relative py-28 md:py-36">
       <div className="mx-auto max-w-7xl px-5 md:px-8">
-        <SectionTitle
+        <ScrollHighlightText
           kicker="Planos"
-          title={<>Escolha o seu <span className="gradient-text-ember">caminho</span></>}
-          subtitle="Cancele quando quiser. Primeira semana grátis em todos os planos."
+          text="Escolha o seu caminho"
+          highlightIndexStart={3}
         />
+        <p className="mx-auto mt-6 max-w-xl text-center text-pretty text-white/60">
+          Cancele quando quiser. Primeira semana grátis em todos os planos.
+        </p>
         <div className="mt-16 grid gap-6 lg:grid-cols-3">
           {plans.map((p, i) => (
             <Reveal key={p.name} delay={i * 0.08}>
@@ -1165,7 +1339,7 @@ function Footer() {
           <div className="text-xs uppercase tracking-[0.25em] text-white/40">Endereço</div>
           <p className="mt-3 flex items-start gap-2 text-sm text-white/75">
             <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-            Av. Paulista, 1.800 · Bela Vista · São Paulo / SP
+            {siteConfig.address.full}
           </p>
         </div>
         <div>
@@ -1184,29 +1358,28 @@ function Footer() {
         </div>
       </div>
 
-      {/* stylized map */}
+      {/* Google Maps Embed */}
       <div className="mx-auto mt-12 max-w-7xl px-5 md:px-8">
-        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[oklch(0.14_0.005_20)] p-1">
-          <svg viewBox="0 0 1200 220" className="h-40 w-full opacity-70" aria-hidden>
-            <defs>
-              <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="oklch(1 0 0 / 0.06)" strokeWidth="1" />
-              </pattern>
-            </defs>
-            <rect width="1200" height="220" fill="url(#grid)" />
-            <path d="M0 140 Q300 60 600 140 T1200 110" stroke="oklch(0.62 0.24 22 / 0.6)" strokeWidth="2" fill="none" />
-            <circle cx="600" cy="120" r="9" fill="oklch(0.62 0.24 22)" />
-            <circle cx="600" cy="120" r="20" fill="none" stroke="oklch(0.62 0.24 22 / 0.5)" strokeWidth="2">
-              <animate attributeName="r" from="9" to="40" dur="2.4s" repeatCount="indefinite" />
-              <animate attributeName="opacity" from="0.6" to="0" dur="2.4s" repeatCount="indefinite" />
-            </circle>
-          </svg>
+        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[oklch(0.14_0.005_20)] p-1 h-80 shadow-2xl">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15876.541416972007!2d-35.1843231!3d-5.8860714!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x7b2fc20054fffff%3A0xc3cbcfd1f67f5df5!2sPonta+Negra%2C+Natal+-+RN!5e0!3m2!1spt-BR!2sbr!4v1700000000000!5m2!1spt-BR!2sbr"
+            width="100%"
+            height="100%"
+            style={{ 
+              border: 0 
+            }}
+            allowFullScreen
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            className="w-full h-full rounded-xl"
+            title="Localização da Iron Forge"
+          />
         </div>
       </div>
 
       <div className="mx-auto mt-10 max-w-7xl px-5 text-xs text-white/40 md:flex md:items-center md:justify-between md:px-8">
         <span>© {new Date().getFullYear()} Iron Forge. Todos os direitos reservados.</span>
-        <span className="mt-2 block md:mt-0">Forjado em São Paulo.</span>
+        <span className="mt-2 block md:mt-0">Forjado em {siteConfig.address.city}.</span>
       </div>
     </footer>
   );
@@ -1398,5 +1571,223 @@ function FloatingCTA() {
         </motion.div>
       )}
     </AnimatePresence>
+  );
+}
+
+/* ───────────────────── Molten Flow Line (Fio de Aço) ───────────────────── */
+function MoltenFlowLine() {
+  const prefersReducedMotion = useReducedMotion() ?? false;
+  const { scrollYProgress } = useScroll();
+  const scaleY = useSpring(scrollYProgress, { stiffness: 90, damping: 22, restDelta: 0.001 });
+  const tipPercent = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
+
+  if (prefersReducedMotion) return null;
+
+  return (
+    <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-[2px] pointer-events-none z-10 hidden lg:block overflow-hidden">
+      {/* Track */}
+      <div className="absolute inset-y-0 left-0 w-full bg-white/[0.04]" />
+      
+      {/* Flow Line */}
+      <motion.div
+        className="absolute top-0 left-0 w-full origin-top bg-gradient-to-b from-primary/80 via-primary to-orange-500 shadow-[0_0_12px_#ff4500,0_0_24px_#ff4500]"
+        style={{ height: useTransform(scaleY, [0, 1], ["0%", "100%"]) }}
+      />
+      
+      {/* Glowing tip */}
+      <motion.div
+        className="absolute left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-white -mt-2 shadow-[0_0_15px_#ff7f50,0_0_30px_#ff4500,0_0_45px_#ff4500] mix-blend-screen"
+        style={{
+          top: tipPercent,
+        }}
+      >
+        <span className="absolute inset-0 rounded-full animate-ping bg-primary/80 opacity-75" />
+      </motion.div>
+    </div>
+  );
+}
+
+/* ───────────────────── Pillars Card Stack ───────────────────── */
+function PillarImage({ src, alt, tag }: { src: string; alt: string; tag: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"]
+  });
+
+  const y = useTransform(scrollYProgress, [0, 1], [-60, 60]);
+  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [1.02, 1.15, 1.02]);
+
+  return (
+    <div ref={ref} className="relative w-full aspect-video md:aspect-[4/3] rounded-3xl overflow-hidden border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.6)] group">
+      <motion.img
+        src={src}
+        alt={alt}
+        style={{ y, scale }}
+        loading="lazy"
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent pointer-events-none" />
+      <span className="absolute top-4 left-4 rounded-full bg-primary/20 border border-primary/30 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-white backdrop-blur-md font-semibold">
+        {tag}
+      </span>
+    </div>
+  );
+}
+
+function PillarsCardStack() {
+  const cards = [
+    {
+      title: "Treino de Elite",
+      badge: "PILAR 01 · MUSCULAÇÃO",
+      desc: "Sessões desenhadas para máxima hipertrofia e performance, utilizando os melhores equipamentos do mundo (Technogym e Hammer Strength) com acompanhamento cirúrgico.",
+      img: gallery1,
+      tag: "Força & Hipertrofia",
+      stats: "Hammer Strength • Technogym"
+    },
+    {
+      title: "Nutrição Personalizada",
+      badge: "PILAR 02 · BIOIMPEDÂNCIA",
+      desc: "Plano nutricional integrado ao seu treino. Consulta periódica com nutricionistas parceiros da Iron Forge para garantir que sua ingestão calórica esteja alinhada ao seu ganho de massa.",
+      img: nutritionPrep,
+      tag: "Dieta & Performance",
+      stats: "Nutricionista Incluso • Bioimpedância"
+    },
+    {
+      title: "Recovery Zone",
+      badge: "PILAR 03 · SAÚDE & RECOVERY",
+      desc: "Acelere sua regeneração muscular. Sala de recovery completa com sauna de madeira premium, crioterapia (banheira de gelo) e zona de mobilidade para você estar pronto para o próximo treino.",
+      img: recoverySauna,
+      tag: "Regeneração Ativa",
+      stats: "Sauna • Crioterapia • Recovery"
+    },
+  ];
+
+  return (
+    <section id="metodo" className="relative py-28 md:py-36 bg-background">
+      <div className="mx-auto max-w-7xl px-5 md:px-8">
+        <SectionTitle
+          kicker="Os 3 Pilares"
+          title={<>O Método <span className="gradient-text-ember">Iron Forge</span></>}
+          subtitle="Resultados extraordinários exigem sinergia perfeita entre treino, alimentação e regeneração."
+        />
+        
+        <div className="mt-20 md:mt-28 space-y-24 md:space-y-32">
+          {cards.map((card, idx) => {
+            const isEven = idx % 2 === 0;
+            return (
+              <div
+                key={idx}
+                className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-center"
+              >
+                {/* Image Block */}
+                <div className={cn("w-full", !isEven && "md:order-last")}>
+                  <PillarImage src={card.img} alt={card.title} tag={card.tag} />
+                </div>
+
+                {/* Content Block */}
+                <div className="w-full flex flex-col justify-center">
+                  <Reveal delay={0.1}>
+                    <span className="text-xs uppercase tracking-[0.2em] text-primary font-bold">
+                      {card.badge}
+                    </span>
+                    <h3 className="font-display text-4xl md:text-5xl tracking-tight text-white mt-3">
+                      {card.title}
+                    </h3>
+                    <p className="mt-6 text-sm md:text-base leading-relaxed text-white/60">
+                      {card.desc}
+                    </p>
+                    <div className="mt-8 border-t border-white/10 pt-5 text-xs text-white/40 uppercase tracking-widest flex justify-between">
+                      <span>{card.stats}</span>
+                      <span className="text-primary font-bold">0{idx + 1} / 03</span>
+                    </div>
+                  </Reveal>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ───────────────────── Scroll Highlight Text (Apple style) ───────────────────── */
+function ScrollHighlightText({ text, kicker, kickerClass, highlightIndexStart }: { text: string; kicker?: string; kickerClass?: string; highlightIndexStart?: number }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start end", "center center"],
+  });
+
+  const words = text.split(" ");
+
+  return (
+    <div ref={containerRef} className="mx-auto max-w-3xl text-center">
+      {kicker && (
+        <div className={cn("mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-[11px] uppercase tracking-[0.25em] text-primary", kickerClass)}>
+          <span className="h-1 w-1 rounded-full bg-primary" />
+          {kicker}
+        </div>
+      )}
+      <h2 className="font-display text-[clamp(2.2rem,5vw,4.2rem)] leading-[1.1] tracking-tight flex flex-wrap justify-center gap-x-3 gap-y-2">
+        {words.map((word, idx) => {
+          const start = idx / words.length;
+          const end = (idx + 1) / words.length;
+          const opacity = useTransform(scrollYProgress, [start, end], [0.15, 1]);
+          const isHighlighted = highlightIndexStart !== undefined && idx >= highlightIndexStart;
+          return (
+            <motion.span
+              key={idx}
+              style={{ opacity }}
+              className={cn("inline-block", isHighlighted ? "gradient-text-ember ember-text-glow font-bold" : "text-white")}
+            >
+              {word}
+            </motion.span>
+          );
+        })}
+      </h2>
+    </div>
+  );
+}
+
+/* ───────────────────── Metric Circle for before/after transformation ───────────────────── */
+interface MetricCircleProps {
+  label: string;
+  fromVal: string;
+  toVal: string;
+  pct: number;
+  delay?: number;
+}
+
+function MetricCircle({ label, fromVal, toVal, pct, delay = 0 }: MetricCircleProps) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-40px" });
+  const dashArray = 251.2;
+
+  return (
+    <div ref={ref} className="flex flex-col items-center p-5 rounded-2xl border border-white/5 bg-white/[0.01] backdrop-blur-sm shadow-xl">
+      <div className="relative w-24 h-24 flex items-center justify-center">
+        <svg className="w-full h-full -rotate-90">
+          <circle cx="48" cy="48" r="40" className="stroke-white/5 fill-none" strokeWidth="6" />
+          <motion.circle
+            cx="48"
+            cy="48"
+            r="40"
+            className="stroke-primary fill-none"
+            strokeWidth="6"
+            strokeDasharray={dashArray}
+            initial={{ strokeDashoffset: dashArray }}
+            animate={inView ? { strokeDashoffset: dashArray - (dashArray * pct) / 100 } : {}}
+            transition={{ duration: 1.5, delay, ease: "easeOut" }}
+          />
+        </svg>
+        <div className="absolute flex flex-col items-center">
+          <span className="text-xs text-white/40 line-through font-semibold">{fromVal}</span>
+          <span className="text-lg font-bold text-white leading-none mt-0.5">{toVal}</span>
+        </div>
+      </div>
+      <span className="mt-3 text-xs uppercase tracking-widest text-white/60 font-semibold text-center">{label}</span>
+    </div>
   );
 }

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
-import { createHash } from "crypto";
+import { createHash, randomUUID } from "crypto";
 import type { Database } from "@/integrations/supabase/types";
 import { leadFormSchema, normalizePhone } from "@/lib/leads.schema";
 import { dispatchNotifications } from "@/lib/notifications";
@@ -85,9 +85,12 @@ export const Route = createFileRoute("/api/public/leads")({
 
         const phoneNormalized = normalizePhone(data.phone);
 
-        const { data: inserted, error } = await supabase
+        const leadId = randomUUID();
+
+        const { error } = await supabase
           .from("leads")
           .insert({
+            id: leadId,
             name: data.name,
             email: data.email,
             phone: phoneNormalized,
@@ -99,9 +102,7 @@ export const Route = createFileRoute("/api/public/leads")({
             utm_medium: data.utm_medium || null,
             utm_campaign: data.utm_campaign || null,
             ip_hash: ipHash,
-          })
-          .select("id")
-          .single();
+          });
 
         if (error) {
           console.error("[leads] Falha ao inserir lead no Supabase:", error);
@@ -111,11 +112,11 @@ export const Route = createFileRoute("/api/public/leads")({
           );
         }
 
-        console.log(`[leads] Lead registrado: ID=${inserted.id}, Nome=${data.name}, Email=${data.email}`);
+        console.log(`[leads] Lead registrado: ID=${leadId}, Nome=${data.name}, Email=${data.email}`);
 
         // Dispara e-mail, alertas de Discord e Telegram de forma assíncrona
         void dispatchNotifications({
-          id: inserted.id,
+          id: leadId,
           name: data.name,
           email: data.email,
           phone: phoneNormalized,
@@ -135,7 +136,7 @@ export const Route = createFileRoute("/api/public/leads")({
             method: "POST",
             headers: { "content-type": "application/json" },
             body: JSON.stringify({
-              id: inserted.id,
+              id: leadId,
               created_at: new Date().toISOString(),
               name: data.name,
               email: data.email,
@@ -151,7 +152,7 @@ export const Route = createFileRoute("/api/public/leads")({
           }).catch((e) => console.error("[leads] sheets webhook failed", e));
         }
 
-        return Response.json({ ok: true, leadId: inserted.id }, { status: 200 });
+        return Response.json({ ok: true, leadId: leadId }, { status: 200 });
       },
     },
   },

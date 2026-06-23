@@ -9,14 +9,21 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as PlanilhaRouteImport } from './routes/planilha'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedClientesRouteImport } from './routes/_authenticated/clientes'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as ApiPublicLeadsRouteImport } from './routes/api/public/leads'
+import { Route as ApiPublicDownloadLeadsRouteImport } from './routes/api/public/download-leads'
 import { Route as ApiPublicBookingsRouteImport } from './routes/api/public/bookings'
 
+const PlanilhaRoute = PlanilhaRouteImport.update({
+  id: '/planilha',
+  path: '/planilha',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -46,6 +53,11 @@ const ApiPublicLeadsRoute = ApiPublicLeadsRouteImport.update({
   path: '/api/public/leads',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicDownloadLeadsRoute = ApiPublicDownloadLeadsRouteImport.update({
+  id: '/api/public/download-leads',
+  path: '/api/public/download-leads',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicBookingsRoute = ApiPublicBookingsRouteImport.update({
   id: '/api/public/bookings',
   path: '/api/public/bookings',
@@ -55,17 +67,21 @@ const ApiPublicBookingsRoute = ApiPublicBookingsRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/planilha': typeof PlanilhaRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/clientes': typeof AuthenticatedClientesRoute
   '/api/public/bookings': typeof ApiPublicBookingsRoute
+  '/api/public/download-leads': typeof ApiPublicDownloadLeadsRoute
   '/api/public/leads': typeof ApiPublicLeadsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/planilha': typeof PlanilhaRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/clientes': typeof AuthenticatedClientesRoute
   '/api/public/bookings': typeof ApiPublicBookingsRoute
+  '/api/public/download-leads': typeof ApiPublicDownloadLeadsRoute
   '/api/public/leads': typeof ApiPublicLeadsRoute
 }
 export interface FileRoutesById {
@@ -73,9 +89,11 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/planilha': typeof PlanilhaRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/clientes': typeof AuthenticatedClientesRoute
   '/api/public/bookings': typeof ApiPublicBookingsRoute
+  '/api/public/download-leads': typeof ApiPublicDownloadLeadsRoute
   '/api/public/leads': typeof ApiPublicLeadsRoute
 }
 export interface FileRouteTypes {
@@ -83,26 +101,32 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/planilha'
     | '/admin'
     | '/clientes'
     | '/api/public/bookings'
+    | '/api/public/download-leads'
     | '/api/public/leads'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
+    | '/planilha'
     | '/admin'
     | '/clientes'
     | '/api/public/bookings'
+    | '/api/public/download-leads'
     | '/api/public/leads'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/planilha'
     | '/_authenticated/admin'
     | '/_authenticated/clientes'
     | '/api/public/bookings'
+    | '/api/public/download-leads'
     | '/api/public/leads'
   fileRoutesById: FileRoutesById
 }
@@ -110,12 +134,21 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  PlanilhaRoute: typeof PlanilhaRoute
   ApiPublicBookingsRoute: typeof ApiPublicBookingsRoute
+  ApiPublicDownloadLeadsRoute: typeof ApiPublicDownloadLeadsRoute
   ApiPublicLeadsRoute: typeof ApiPublicLeadsRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/planilha': {
+      id: '/planilha'
+      path: '/planilha'
+      fullPath: '/planilha'
+      preLoaderRoute: typeof PlanilhaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -158,6 +191,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicLeadsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/download-leads': {
+      id: '/api/public/download-leads'
+      path: '/api/public/download-leads'
+      fullPath: '/api/public/download-leads'
+      preLoaderRoute: typeof ApiPublicDownloadLeadsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/bookings': {
       id: '/api/public/bookings'
       path: '/api/public/bookings'
@@ -185,7 +225,9 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  PlanilhaRoute: PlanilhaRoute,
   ApiPublicBookingsRoute: ApiPublicBookingsRoute,
+  ApiPublicDownloadLeadsRoute: ApiPublicDownloadLeadsRoute,
   ApiPublicLeadsRoute: ApiPublicLeadsRoute,
 }
 export const routeTree = rootRouteImport

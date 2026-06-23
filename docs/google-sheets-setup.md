@@ -20,20 +20,68 @@ Data | Nome | Email | WhatsApp | Objetivo | Origem | UTM Source | Observações 
 function doPost(e) {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   const d = JSON.parse(e.postData.contents);
-  sheet.appendRow([
-    new Date(d.created_at || Date.now()),
-    d.name || "",
-    d.email || "",
-    d.phone || "",
-    d.goal || "",
-    d.source || "",
-    d.utm_source || "",
-    d.notes || "",
-    d.best_contact_time || ""
-  ]);
-  return ContentService
-    .createTextOutput(JSON.stringify({ ok: true }))
-    .setMimeType(ContentService.MimeType.JSON);
+  
+  if (d.event === "booking") {
+    // É um agendamento. Vamos procurar o lead pelo e-mail ou WhatsApp
+    const dataRange = sheet.getDataRange();
+    const values = dataRange.getValues();
+    const emailToFind = d.email || "";
+    const phoneToFind = d.phone || "";
+    
+    let foundRowIndex = -1;
+    for (let i = 1; i < values.length; i++) {
+      const row = values[i];
+      // Procura na coluna 2 (Email - index 2) ou coluna 3 (WhatsApp - index 3)
+      if ((emailToFind && row[2] == emailToFind) || (phoneToFind && row[3] == phoneToFind)) {
+        foundRowIndex = i + 1; // index 1-based do Sheets
+        break;
+      }
+    }
+    
+    if (foundRowIndex !== -1) {
+      // Atualiza a coluna 10 (J) com o horário do agendamento
+      if (values[0].length < 10 || values[0][9] !== "Agendamento") {
+        sheet.getRange(1, 10).setValue("Agendamento");
+      }
+      sheet.getRange(foundRowIndex, 10).setValue(d.booking_time);
+      return ContentService
+        .createTextOutput(JSON.stringify({ ok: true, updated: true }))
+        .setMimeType(ContentService.MimeType.JSON);
+    } else {
+      // Se não achar o lead, adiciona uma linha separada para o agendamento
+      sheet.appendRow([
+        new Date(d.created_at || Date.now()),
+        d.name || "Agendamento Avulso",
+        d.email || "",
+        d.phone || "",
+        "", "", "", d.notes || "", "", d.booking_time || ""
+      ]);
+      return ContentService
+        .createTextOutput(JSON.stringify({ ok: true, appended: true }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+  } else {
+    // É um cadastro de lead comum
+    const dataRange = sheet.getDataRange();
+    if (dataRange.getLastColumn() < 10) {
+      sheet.getRange(1, 10).setValue("Agendamento");
+    }
+    sheet.appendRow([
+      new Date(d.created_at || Date.now()),
+      d.name || "",
+      d.email || "",
+      d.phone || "",
+      d.goal || "",
+      d.source || "",
+      d.utm_source || "",
+      d.notes || "",
+      d.best_contact_time || "",
+      d.booking_time || ""
+    ]);
+    return ContentService
+      .createTextOutput(JSON.stringify({ ok: true }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
 }
 ```
 

@@ -14,8 +14,8 @@ export const siteConfig = {
   // Contato
   whatsapp: {
     // Apenas dígitos, com DDI (Brasil = 55) + DDD + número
-    number: "5511999999999",
-    display: "(11) 99999-9999",
+    number: "558498071144",
+    display: "(84) 9807-1144",
     // Mensagem padrão enviada após cadastro
     leadMessage:
       "Olá, acabei de me cadastrar na Iron Forge e gostaria de agendar minha aula experimental.",
@@ -25,12 +25,12 @@ export const siteConfig = {
 
   // Endereço
   address: {
-    street: "Av. Paulista, 1.800",
-    district: "Bela Vista",
-    city: "São Paulo",
-    state: "SP",
-    full: "Av. Paulista, 1.800 · Bela Vista · São Paulo / SP",
-    mapsUrl: "https://maps.google.com/?q=Av.+Paulista,+1800,+São+Paulo",
+    street: "Av. Eng. Roberto Freire, 3100",
+    district: "Ponta Negra",
+    city: "Natal",
+    state: "RN",
+    full: "Av. Eng. Roberto Freire, 3100 · Ponta Negra · Natal / RN",
+    mapsUrl: "https://maps.google.com/?q=Av.+Eng.+Roberto+Freire,+3100,+Natal,+RN",
   },
 
   hours: "Seg–Sex 5h–23h · Sáb 7h–20h · Dom 8h–14h",
