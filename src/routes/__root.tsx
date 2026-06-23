@@ -196,19 +196,19 @@ function RootShell({ children }: { children: ReactNode }) {
               "name": "Iron Forge Premium Strength Club",
               "image": "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/e6e260be-d10b-4312-ab6b-30a9d253d77c/id-preview-b87df11f--c7df417a-e102-4e16-b639-5d85339d603d.lovable.app-1781819293696.png",
               "url": "https://ironforge.com.br",
-              "telephone": "+551140028922",
+              "telephone": "+5584991234567",
               "address": {
                 "@type": "PostalAddress",
-                "streetAddress": "Av. Paulista, 1.800",
-                "addressLocality": "São Paulo",
-                "addressRegion": "SP",
-                "postalCode": "01310-200",
+                "streetAddress": "Av. Eng. Roberto Freire, 3100",
+                "addressLocality": "Natal",
+                "addressRegion": "RN",
+                "postalCode": "59090-000",
                 "addressCountry": "BR"
               },
               "geo": {
                 "@type": "GeoCoordinates",
-                "latitude": -23.5596,
-                "longitude": -46.6578
+                "latitude": -5.8860,
+                "longitude": -35.1843
               },
               "openingHoursSpecification": [
                 {
