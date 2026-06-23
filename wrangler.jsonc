@@ -5,6 +5,9 @@
   "compatibility_date": "2025-06-23",
   "compatibility_flags": ["nodejs_compat"],
 
+  // Habilita deploy para o subdomínio workers.dev
+  "workers_dev": true,
+
   // Server entry — uses our SSR wrapper (src/server.ts compiled by vite build)
   "main": "dist/server/server.js",
 
@@ -17,3 +20,4 @@
     "enabled": true
   }
 }
+
