@@ -328,7 +328,7 @@ function Hero({ prefersReducedMotion }: { prefersReducedMotion: boolean }) {
           poster={heroImg}
         >
           <source
-            src="/iron-forge-hero-background.mp4"
+            src="/crie_um_video_para_uma_landing.mp4"
             type="video/mp4"
           />
           <img src={heroImg} className="h-full w-full object-cover" alt="Treinamento de força de elite na arena Iron Forge" />
