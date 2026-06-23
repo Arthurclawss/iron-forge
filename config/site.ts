@@ -37,7 +37,7 @@ export const siteConfig = {
     clientId: process.env.PAYPAL_CLIENT_ID || "",
     mode: (process.env.PAYPAL_MODE || "sandbox") as "sandbox" | "live",
   },
-  phone: "(11) 4002-8922",
+  phone: "(84) 99123-4567",
   email: "contato@ironforge.com.br",
 
   // Endereço
