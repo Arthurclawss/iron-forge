@@ -7,7 +7,7 @@ import confetti from "canvas-confetti";
 
 import { leadFormSchema, type LeadFormInput, LEAD_GOALS, goalLabels } from "@/lib/leads.schema";
 import { captureUtmParams, trackEvent } from "@/lib/analytics";
-import { siteConfig, buildWhatsAppUrl } from "../../../config/site";
+import { siteConfig, buildWhatsAppUrl } from "../../../../config/site";
 
 function maskPhone(value: string): string {
   const d = value.replace(/\D/g, "").slice(0, 11);
