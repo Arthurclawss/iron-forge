@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
-import { createHash, randomUUID } from "crypto";
 import type { Database } from "@/integrations/supabase/types";
 import { leadFormSchema, normalizePhone } from "@/lib/leads.schema";
 import { dispatchNotifications } from "@/lib/notifications";
@@ -17,6 +16,20 @@ function checkRateLimit(key: string): boolean {
   hits.push(now);
   rateBucket.set(key, hits);
   return true;
+}
+
+/** Gera UUID v4 usando a Web Crypto API (nativa no Cloudflare Workers e browsers). */
+function generateUUID(): string {
+  return globalThis.crypto.randomUUID();
+}
+
+/** Gera um hash SHA-256 do IP usando a Web Crypto API. */
+async function hashIp(ip: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(ip);
+  const hashBuffer = await globalThis.crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("").slice(0, 32);
 }
 
 function getClientIp(req: Request): string {
@@ -59,7 +72,7 @@ export const Route = createFileRoute("/api/public/leads")({
         }
 
         const ip = getClientIp(request);
-        const ipHash = createHash("sha256").update(ip).digest("hex").slice(0, 32);
+        const ipHash = await hashIp(ip);
 
         if (!checkRateLimit(ipHash)) {
           console.warn(`[Rate Limit] Limite de requisições atingido para o IP hash: ${ipHash}`);
@@ -85,7 +98,7 @@ export const Route = createFileRoute("/api/public/leads")({
 
         const phoneNormalized = normalizePhone(data.phone);
 
-        const leadId = randomUUID();
+        const leadId = generateUUID();
 
         const { error } = await supabase
           .from("leads")

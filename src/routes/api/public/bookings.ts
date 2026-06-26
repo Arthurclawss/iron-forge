@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
-import { randomUUID } from "crypto";
 import type { Database } from "@/integrations/supabase/types";
 
 const bookingSchema = z.object({
