@@ -1,12 +1,10 @@
 import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { motion, AnimatePresence } from "motion/react";
-import { Calculator, ArrowRight, Loader2, RefreshCw, Trophy, Flame } from "lucide-react";
+import { Calculator, ArrowRight, RefreshCw, Trophy } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import confetti from "canvas-confetti";
 
-import { leadFormSchema, type LeadFormInput, goalLabels } from "@/lib/leads.schema";
+import { goalLabels } from "@/lib/leads.schema";
 import { siteConfig } from "../../../config/site";
 import { trackEvent } from "@/lib/analytics";
 
@@ -20,7 +18,7 @@ interface CalculatorInputs {
 }
 
 export default function FitnessCalculator() {
-  const [step, setStep] = useState<"input" | "gate" | "results">("input");
+  const [step, setStep] = useState<"input" | "results">("input");
   const [calcData, setCalcData] = useState<CalculatorInputs>({
     weight: 75,
     height: 175,
@@ -38,28 +36,14 @@ export default function FitnessCalculator() {
     macros: { name: string; value: number; color: string }[];
   } | null>(null);
 
-  const [submitting, setSubmitting] = useState(false);
-  const [serverError, setServerError] = useState<string | null>(null);
-
-  // Form para captura de leads no step "gate"
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-  } = useForm<LeadFormInput>({
-    resolver: zodResolver(leadFormSchema),
-    defaultValues: { goal: "hipertrofia", website: "" },
-    mode: "onBlur",
-  });
-
   const handleCalculate = (e: React.FormEvent) => {
     e.preventDefault();
-    // Atualiza a meta no formulário de lead
-    setValue("goal", calcData.goal === "emagrecimento" ? "emagrecimento" : 
-                    calcData.goal === "hipertrofia" ? "hipertrofia" :
-                    calcData.goal === "performance" ? "performance" : "condicionamento");
-    setStep("gate");
+    processResults();
+    setStep("results");
+    
+    // Confetes rápidos para celebrar o resultado!
+    const colors = ["#ff4d2e", "#ffb199", "#ffffff", "#ff7a4d"];
+    confetti({ particleCount: 50, spread: 50, colors });
   };
 
   const processResults = () => {
@@ -115,45 +99,7 @@ export default function FitnessCalculator() {
     setResults({ bmi, bmiCategory, tdee, targetCalories, macros });
   };
 
-  const onSubmitLead = async (values: LeadFormInput) => {
-    if (submitting) return;
-    setServerError(null);
-    setSubmitting(true);
-    trackEvent("lead_submit", { goal: values.goal, source: "calculator" });
 
-    // Anexa estatísticas da calculadora nas notas
-    const statsNote = `Calculadora - Peso: ${calcData.weight}kg, Altura: ${calcData.height}cm, Idade: ${calcData.age}, Gênero: ${calcData.gender}. TDEE: ${results?.tdee || '—'}kcal.`;
-    const payload = {
-      ...values,
-      notes: values.notes ? `${values.notes} | ${statsNote}` : statsNote,
-      source: "calculator",
-    };
-
-    try {
-      const res = await fetch(siteConfig.leadsEndpoint, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const json = await res.json().catch(() => ({}));
-      if (!res.ok || !json.ok) {
-        setServerError(json.error ?? "Erro ao processar cadastro.");
-        return;
-      }
-      
-      processResults();
-      setStep("results");
-      trackEvent("lead_success", { leadId: json.leadId, from: "calculator" });
-      
-      // Confetes
-      const colors = ["#ff4d2e", "#ffb199", "#ffffff", "#ff7a4d"];
-      confetti({ particleCount: 70, spread: 60, colors });
-    } catch (e) {
-      setServerError("Falha de conexão. Tente novamente.");
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
   const handleReset = () => {
     setStep("input");
@@ -301,95 +247,7 @@ export default function FitnessCalculator() {
               </motion.form>
             )}
 
-            {/* ETAPA 2: CADASTRO DO LEAD (GATE) */}
-            {step === "gate" && (
-              <motion.div
-                key="step-gate"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="mx-auto max-w-md text-center py-4"
-              >
-                <div className="grid h-12 w-12 place-items-center rounded-full bg-primary/15 text-primary mx-auto mb-4">
-                  <Flame className="h-6 w-6 animate-pulse" />
-                </div>
-                <h3 className="font-display text-2xl tracking-tight text-white">Excelente! Seus resultados estão prontos.</h3>
-                <p className="mt-2 text-sm text-white/60">
-                  Preencha o contato abaixo para desbloquear seu IMC, taxa metabólica, sugestões de macros e receber seu plano experimental.
-                </p>
 
-                <form onSubmit={handleSubmit(onSubmitLead)} className="mt-6 grid gap-4 text-left">
-                  {/* Honeypot */}
-                  <div className="absolute -left-[9999px] top-auto h-0 w-0 overflow-hidden" aria-hidden>
-                    <input type="text" tabIndex={-1} {...register("website")} />
-                  </div>
-
-                  <label className="grid gap-1">
-                    <span className="text-xs uppercase tracking-wider text-white/50">Nome Completo</span>
-                    <input
-                      {...register("name")}
-                      type="text"
-                      required
-                      placeholder="Seu nome"
-                      className="rounded-lg border border-white/10 bg-white/[0.03] px-3.5 h-11 text-sm text-white outline-none focus:border-primary"
-                    />
-                    {errors.name && <span className="text-xs text-red-400 mt-1">{errors.name.message}</span>}
-                  </label>
-
-                  <label className="grid gap-1">
-                    <span className="text-xs uppercase tracking-wider text-white/50">WhatsApp</span>
-                    <input
-                      {...register("phone")}
-                      type="tel"
-                      inputMode="tel"
-                      required
-                      placeholder="(84) 99999-9999"
-                      className="rounded-lg border border-white/10 bg-white/[0.03] px-3.5 h-11 text-sm text-white outline-none focus:border-primary"
-                    />
-                    {errors.phone && <span className="text-xs text-red-400 mt-1">{errors.phone.message}</span>}
-                  </label>
-
-                  <label className="grid gap-1">
-                    <span className="text-xs uppercase tracking-wider text-white/50">E-mail</span>
-                    <input
-                      {...register("email")}
-                      type="email"
-                      inputMode="email"
-                      required
-                      placeholder="exemplo@email.com"
-                      className="rounded-lg border border-white/10 bg-white/[0.03] px-3.5 h-11 text-sm text-white outline-none focus:border-primary"
-                    />
-                    {errors.email && <span className="text-xs text-red-400 mt-1">{errors.email.message}</span>}
-                  </label>
-
-                  {serverError && <p className="text-xs text-red-400 text-center">{serverError}</p>}
-
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    className="mt-2 flex w-full min-h-[44px] h-12 items-center justify-center gap-2 rounded-full gradient-ember py-3 text-sm font-semibold text-white disabled:opacity-55 hover:scale-[1.01] transition-transform focus:outline-none cursor-pointer"
-                  >
-                    {submitting ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin" /> Processando…
-                      </>
-                    ) : (
-                      <>
-                        Ver Meus Resultados <ArrowRight className="h-4 w-4" />
-                      </>
-                    )}
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setStep("input")}
-                    className="flex min-h-[44px] items-center justify-center text-xs text-white/40 hover:text-white/70 text-center mt-2 focus:outline-none cursor-pointer"
-                  >
-                    ← Voltar e ajustar parâmetros
-                  </button>
-                </form>
-              </motion.div>
-            )}
 
             {/* ETAPA 3: EXIBIÇÃO DE RESULTADOS COM GRÁFICO RECHARTS */}
             {step === "results" && results && (

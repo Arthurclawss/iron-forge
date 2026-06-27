@@ -65,7 +65,7 @@ export default function IronForgeLanding() {
         <Plans onSelectPlan={setSelectedPlan} />
         <Testimonials />
         <FAQ />
-        <LeadFormSection />
+        <LeadFormSection onSelectPlan={setSelectedPlan} />
       </main>
       <Footer />
 

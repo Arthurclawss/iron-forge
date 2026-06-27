@@ -1,6 +1,11 @@
 import LeadForm from "./LeadForm";
+import { type PlanKey } from "../PaymentModal";
 
-export default function LeadFormSection() {
+interface LeadFormSectionProps {
+  onSelectPlan?: (plan: PlanKey) => void;
+}
+
+export default function LeadFormSection({ onSelectPlan }: LeadFormSectionProps) {
   return (
     <section
       id="cadastro"
@@ -33,7 +38,7 @@ export default function LeadFormSection() {
           </ul>
         </div>
         <div className="rounded-2xl border border-white/10 bg-[oklch(0.12_0.005_20)] p-6 md:p-8">
-          <LeadForm />
+          <LeadForm onSelectPlan={onSelectPlan} />
         </div>
       </div>
     </section>

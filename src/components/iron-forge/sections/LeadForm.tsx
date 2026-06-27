@@ -10,6 +10,11 @@ import { captureUtmParams, trackEvent } from "@/lib/analytics";
 import { siteConfig, buildWhatsAppUrl } from "../../../../config/site";
 import { Calendar } from "@/components/ui/calendar";
 import { ptBR } from "date-fns/locale";
+import { type PlanKey } from "../PaymentModal";
+
+interface LeadFormProps {
+  onSelectPlan?: (plan: PlanKey) => void;
+}
 
 function maskPhone(value: string): string {
   const d = value.replace(/\D/g, "").slice(0, 11);
@@ -25,7 +30,7 @@ function fireConfetti() {
   setTimeout(() => confetti({ particleCount: 60, spread: 100, origin: { y: 0.5 }, colors }), 250);
 }
 
-export default function LeadForm() {
+export default function LeadForm({ onSelectPlan }: LeadFormProps) {
   const [submitting, setSubmitting] = useState(false);
   const [step, setStep] = useState<"form" | "scheduler" | "success">("form");
   const [leadInfo, setLeadInfo] = useState<{
@@ -114,6 +119,8 @@ export default function LeadForm() {
           setBookingTime(time);
           setStep("success");
           fireConfetti();
+          // Abre o modal de pagamento para o plano mais escolhido (Forge)
+          onSelectPlan?.("forge");
         }}
         onBack={() => setStep("form")}
       />
@@ -130,6 +137,7 @@ export default function LeadForm() {
         leadNotes={leadInfo.notes}
         bookingDate={bookingDate}
         bookingTime={bookingTime}
+        onSelectPlan={onSelectPlan}
       />
     );
   }
@@ -297,6 +305,7 @@ function SuccessScreen({
   leadName,
   bookingDate,
   bookingTime,
+  onSelectPlan,
 }: { 
   leadId: string | null;
   leadName: string;
@@ -305,6 +314,7 @@ function SuccessScreen({
   leadNotes?: string;
   bookingDate?: Date;
   bookingTime?: string;
+  onSelectPlan?: (plan: PlanKey) => void;
 }) {
   const formattedDate = bookingDate 
     ? bookingDate.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" })
@@ -317,9 +327,10 @@ function SuccessScreen({
   const whatsAppUrl = buildWhatsAppUrl(textMsg);
 
   useEffect(() => {
+    // Redireciona para o WhatsApp após 5 segundos se eles não clicarem em nada
     const timer = setTimeout(() => {
       window.location.href = whatsAppUrl;
-    }, 4500);
+    }, 5500);
     return () => clearTimeout(timer);
   }, [whatsAppUrl]);
 
@@ -345,15 +356,26 @@ function SuccessScreen({
           </p>
         )}
         <p className="mx-auto mt-4 max-w-sm text-xs text-primary animate-pulse font-semibold">
-          Redirecionando para o WhatsApp para confirmar o seu agendamento...
+          Confirmando detalhes do treino no WhatsApp...
         </p>
       </div>
-      <a
-        href={whatsAppUrl}
-        className="mt-2 inline-flex items-center justify-center gap-2 rounded-full bg-[#25D366] px-8 py-3.5 text-sm font-semibold text-black shadow-lg shadow-emerald-500/20 transition-all hover:scale-[1.01]"
-      >
-        <MessageCircle className="h-4 w-4" /> Confirmar no WhatsApp Agora
-      </a>
+      <div className="flex flex-col sm:flex-row gap-3 w-full mt-2">
+        <a
+          href={whatsAppUrl}
+          className="flex-1 inline-flex items-center justify-center gap-2 rounded-full bg-[#25D366] px-5 py-3 text-xs font-semibold text-black shadow-lg shadow-emerald-500/20 transition-all hover:scale-[1.01]"
+        >
+          <MessageCircle className="h-4 w-4" /> Confirmar via WhatsApp
+        </a>
+        {onSelectPlan && (
+          <button
+            type="button"
+            onClick={() => onSelectPlan("forge")}
+            className="flex-1 inline-flex items-center justify-center gap-2 rounded-full gradient-ember px-5 py-3 text-xs font-semibold text-white ember-glow hover:scale-[1.01]"
+          >
+            Concluir Matrícula Online
+          </button>
+        )}
+      </div>
     </motion.div>
   );
 }
