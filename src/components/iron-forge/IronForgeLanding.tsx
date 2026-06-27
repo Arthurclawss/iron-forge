@@ -15,7 +15,6 @@ import Transformation from "./sections/Transformation";
 import Plans from "./sections/Plans";
 import Testimonials from "./sections/Testimonials";
 import FAQ from "./sections/FAQ";
-import LeadFormSection from "./sections/LeadFormSection";
 import Footer from "./sections/Footer";
 import FloatingWidgets from "./sections/FloatingWidgets";
 
@@ -61,11 +60,10 @@ export default function IronForgeLanding() {
         <Gallery />
         <Results />
         <Transformation />
-        <FitnessCalculator />
+        <FitnessCalculator onSelectPlan={setSelectedPlan} />
         <Plans onSelectPlan={setSelectedPlan} />
         <Testimonials />
         <FAQ />
-        <LeadFormSection onSelectPlan={setSelectedPlan} />
       </main>
       <Footer />
 
