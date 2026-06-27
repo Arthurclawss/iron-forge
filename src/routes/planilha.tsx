@@ -55,6 +55,7 @@ function PlanilhaPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [goalFilter, setGoalFilter] = useState("");
   const [showSheetsInfo, setShowSheetsInfo] = useState(false);
+  const [viewMode, setViewMode] = useState<"database" | "googlesheets">("database");
 
   // Verificação inicial
   useEffect(() => {
@@ -451,132 +452,182 @@ function PlanilhaPage() {
               </AnimatePresence>
 
               {/* Table section */}
-              <div className="space-y-4">
-                {/* Search & Filters */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div className="relative flex-1 max-w-md">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30" />
-                    <input
-                      type="text"
-                      placeholder="Buscar por nome, email ou WhatsApp..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full rounded-lg border border-white/10 bg-white/[0.03] pl-10 pr-4 py-2.5 text-xs text-white placeholder:text-white/30 outline-none focus:border-primary transition-all"
-                    />
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-white/40">Filtrar objetivo:</span>
-                    <select
-                      value={goalFilter}
-                      onChange={(e) => setGoalFilter(e.target.value)}
-                      className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-xs text-white outline-none focus:border-primary"
-                    >
-                      <option value="" className="bg-[oklch(0.12_0.005_20)]">Todos</option>
-                      {Object.entries(goalLabels).map(([key, label]) => (
-                        <option key={key} value={key} className="bg-[oklch(0.12_0.005_20)]">
-                          {label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+              <div className="space-y-6">
+                {/* View Mode Tabs */}
+                <div className="flex border-b border-white/10 gap-6">
+                  <button
+                    onClick={() => setViewMode("database")}
+                    className={`pb-3 text-sm font-semibold border-b-2 transition-all cursor-pointer flex items-center gap-2 ${
+                      viewMode === "database"
+                        ? "border-primary text-primary"
+                        : "border-transparent text-white/40 hover:text-white/70"
+                    }`}
+                  >
+                    <Layers className="h-4 w-4" /> Banco de Dados (Supabase)
+                  </button>
+                  <button
+                    onClick={() => setViewMode("googlesheets")}
+                    className={`pb-3 text-sm font-semibold border-b-2 transition-all cursor-pointer flex items-center gap-2 ${
+                      viewMode === "googlesheets"
+                        ? "border-primary text-primary"
+                        : "border-transparent text-white/40 hover:text-white/70"
+                    }`}
+                  >
+                    <FileSpreadsheet className="h-4 w-4" /> Google Sheets Oficial
+                  </button>
                 </div>
 
-                {/* Main Table Card */}
-                <div className="rounded-xl border border-white/10 bg-white/[0.01] overflow-hidden">
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse text-xs">
-                      <thead>
-                        <tr className="bg-white/[0.04] text-[10px] uppercase tracking-wider text-white/40 border-b border-white/10">
-                          <th className="px-5 py-4 font-semibold">Nome</th>
-                          <th className="px-5 py-4 font-semibold">WhatsApp</th>
-                          <th className="px-5 py-4 font-semibold">Objetivo</th>
-                          <th className="px-5 py-4 font-semibold text-primary">Agendamento</th>
-                          <th className="px-5 py-4 font-semibold">Origem</th>
-                          <th className="px-5 py-4 font-semibold">Melhor Horário</th>
-                          <th className="px-5 py-4 font-semibold">Data Cadastro</th>
-                          <th className="px-5 py-4 font-semibold">Notas</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {filteredLeads.length === 0 ? (
-                          <tr>
-                            <td colSpan={8} className="px-5 py-12 text-center text-white/30">
-                              Nenhum cadastro encontrado para os filtros selecionados.
-                            </td>
-                          </tr>
-                        ) : (
-                          filteredLeads.map((l) => (
-                            <tr key={l.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
-                              <td className="px-5 py-4 font-medium">
-                                <div className="font-semibold text-white">{l.name}</div>
-                                <div className="text-[10px] text-white/40 mt-0.5">{l.email}</div>
-                              </td>
-                              <td className="px-5 py-4">
-                                <a
-                                  href={`https://wa.me/${l.phone.replace(/\D/g, "")}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1 text-emerald-400 hover:text-emerald-300 transition-colors font-medium"
-                                >
-                                  {l.phone} <ExternalLink className="h-3 w-3" />
-                                </a>
-                              </td>
-                              <td className="px-5 py-4">
-                                <span className="rounded-full bg-primary/10 border border-primary/20 px-2.5 py-0.5 text-[10px] text-primary font-medium">
-                                  {goalLabels[l.goal as keyof typeof goalLabels] ?? l.goal}
-                                </span>
-                              </td>
-                              <td className="px-5 py-4 font-medium text-primary">
-                                {l.booking_time ? (
-                                  <span className="flex items-center gap-1.5">
-                                    <Calendar className="h-3.5 w-3.5 text-primary" />
-                                    {new Date(l.booking_time).toLocaleString("pt-BR", {
+                {viewMode === "database" ? (
+                  <div className="space-y-4">
+                    {/* Search & Filters */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div className="relative flex-1 max-w-md">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30" />
+                        <input
+                          type="text"
+                          placeholder="Buscar por nome, email ou WhatsApp..."
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          className="w-full rounded-lg border border-white/10 bg-white/[0.03] pl-10 pr-4 py-2.5 text-xs text-white placeholder:text-white/30 outline-none focus:border-primary transition-all"
+                        />
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-white/40">Filtrar objetivo:</span>
+                        <select
+                          value={goalFilter}
+                          onChange={(e) => setGoalFilter(e.target.value)}
+                          className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-xs text-white outline-none focus:border-primary"
+                        >
+                          <option value="" className="bg-[oklch(0.12_0.005_20)]">Todos</option>
+                          {Object.entries(goalLabels).map(([key, label]) => (
+                            <option key={key} value={key} className="bg-[oklch(0.12_0.005_20)]">
+                              {label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Main Table Card */}
+                    <div className="rounded-xl border border-white/10 bg-white/[0.01] overflow-hidden">
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse text-xs">
+                          <thead>
+                            <tr className="bg-white/[0.04] text-[10px] uppercase tracking-wider text-white/40 border-b border-white/10">
+                              <th className="px-5 py-4 font-semibold">Nome</th>
+                              <th className="px-5 py-4 font-semibold">WhatsApp</th>
+                              <th className="px-5 py-4 font-semibold">Objetivo</th>
+                              <th className="px-5 py-4 font-semibold text-primary">Agendamento</th>
+                              <th className="px-5 py-4 font-semibold">Origem</th>
+                              <th className="px-5 py-4 font-semibold">Melhor Horário</th>
+                              <th className="px-5 py-4 font-semibold">Data Cadastro</th>
+                              <th className="px-5 py-4 font-semibold">Notas</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {filteredLeads.length === 0 ? (
+                              <tr>
+                                <td colSpan={8} className="px-5 py-12 text-center text-white/30">
+                                  Nenhum cadastro encontrado para os filtros selecionados.
+                                </td>
+                              </tr>
+                            ) : (
+                              filteredLeads.map((l) => (
+                                <tr key={l.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
+                                  <td className="px-5 py-4 font-medium">
+                                    <div className="font-semibold text-white">{l.name}</div>
+                                    <div className="text-[10px] text-white/40 mt-0.5">{l.email}</div>
+                                  </td>
+                                  <td className="px-5 py-4">
+                                    <a
+                                      href={`https://wa.me/${l.phone.replace(/\D/g, "")}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="inline-flex items-center gap-1 text-emerald-400 hover:text-emerald-300 transition-colors font-medium"
+                                    >
+                                      {l.phone} <ExternalLink className="h-3 w-3" />
+                                    </a>
+                                  </td>
+                                  <td className="px-5 py-4">
+                                    <span className="rounded-full bg-primary/10 border border-primary/20 px-2.5 py-0.5 text-[10px] text-primary font-medium">
+                                      {goalLabels[l.goal as keyof typeof goalLabels] ?? l.goal}
+                                    </span>
+                                  </td>
+                                  <td className="px-5 py-4 font-medium text-primary">
+                                    {l.booking_time ? (
+                                      <span className="flex items-center gap-1.5">
+                                        <Calendar className="h-3.5 w-3.5 text-primary" />
+                                        {new Date(l.booking_time).toLocaleString("pt-BR", {
+                                          day: "2-digit",
+                                          month: "2-digit",
+                                          hour: "2-digit",
+                                          minute: "2-digit"
+                                        })}
+                                      </span>
+                                    ) : (
+                                      <span className="text-white/20">—</span>
+                                    )}
+                                  </td>
+                                  <td className="px-5 py-4">
+                                    <span className="rounded bg-white/5 px-2 py-0.5 text-[10px] text-white/60">
+                                      {l.source === "calculator" ? "Calculadora Fitness" : "Site Principal"}
+                                    </span>
+                                  </td>
+                                  <td className="px-5 py-4 text-white/70">
+                                    {l.best_contact_time || "Qualquer horário"}
+                                  </td>
+                                  <td className="px-5 py-4 text-white/50">
+                                    {new Date(l.created_at).toLocaleString("pt-BR", {
                                       day: "2-digit",
                                       month: "2-digit",
+                                      year: "numeric",
                                       hour: "2-digit",
                                       minute: "2-digit"
                                     })}
-                                  </span>
-                                ) : (
-                                  <span className="text-white/20">—</span>
-                                )}
-                              </td>
-                              <td className="px-5 py-4">
-                                <span className="rounded bg-white/5 px-2 py-0.5 text-[10px] text-white/60">
-                                  {l.source === "calculator" ? "Calculadora Fitness" : "Site Principal"}
-                                </span>
-                              </td>
-                              <td className="px-5 py-4 text-white/70">
-                                {l.best_contact_time || "Qualquer horário"}
-                              </td>
-                              <td className="px-5 py-4 text-white/50">
-                                {new Date(l.created_at).toLocaleString("pt-BR", {
-                                  day: "2-digit",
-                                  month: "2-digit",
-                                  year: "numeric",
-                                  hour: "2-digit",
-                                  minute: "2-digit"
-                                })}
-                              </td>
-                              <td className="px-5 py-4 text-white/60 max-w-xs truncate" title={l.notes}>
-                                {l.notes || "—"}
-                              </td>
-                            </tr>
-                          ))
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
+                                  </td>
+                                  <td className="px-5 py-4 text-white/60 max-w-xs truncate" title={l.notes}>
+                                    {l.notes || "—"}
+                                  </td>
+                                </tr>
+                              ))
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
 
-                {/* Row count */}
-                <div className="flex items-center justify-between text-xs text-white/40 px-2">
-                  <span>
-                    Mostrando <strong>{filteredLeads.length}</strong> de {totalLeads} cadastros
-                  </span>
-                  <span>Chave de acesso: <code className="bg-white/5 px-1.5 py-0.5 rounded font-mono text-[10px] text-primary">{activeToken}</code></span>
-                </div>
+                    {/* Row count */}
+                    <div className="flex items-center justify-between text-xs text-white/40 px-2">
+                      <span>
+                        Mostrando <strong>{filteredLeads.length}</strong> de {totalLeads} cadastros
+                      </span>
+                      <span>Chave de acesso: <code className="bg-white/5 px-1.5 py-0.5 rounded font-mono text-[10px] text-primary">{activeToken}</code></span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="rounded-2xl border border-white/10 bg-white/[0.01] overflow-hidden p-1 space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 border-b border-white/5 bg-white/[0.02]">
+                      <div>
+                        <span className="text-xs text-white/60 font-medium">Visualização oficial do Google Sheets em tempo real</span>
+                        <p className="text-[10px] text-white/40">É necessário estar logado na sua conta Google para visualizar se o acesso for privado.</p>
+                      </div>
+                      <a
+                        href="https://docs.google.com/spreadsheets/d/1DBOsrZnbKm5uU2qqn6yvx6HzcxO77KeIm5js42f4fJU/edit"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-xs text-white hover:bg-white/10 hover:text-white transition-colors"
+                      >
+                        <ExternalLink className="h-3 w-3" /> Abrir no Google Sheets (Nova Aba)
+                      </a>
+                    </div>
+                    <iframe
+                      src="https://docs.google.com/spreadsheets/d/1DBOsrZnbKm5uU2qqn6yvx6HzcxO77KeIm5js42f4fJU/htmlview?widget=true&headers=false"
+                      className="w-full h-[650px] border-0 rounded-lg bg-white/[0.01]"
+                      allowFullScreen
+                    />
+                  </div>
+                )}
               </div>
 
             </main>

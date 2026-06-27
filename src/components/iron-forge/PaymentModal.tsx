@@ -64,7 +64,7 @@ export default function PaymentModal({ plan, onClose }: PaymentSectionProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-md p-4"
+        className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-md p-3 sm:p-4"
         onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
       >
         <motion.div
@@ -73,20 +73,20 @@ export default function PaymentModal({ plan, onClose }: PaymentSectionProps) {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 16, scale: 0.97 }}
           transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-          className="relative w-full max-w-lg overflow-hidden rounded-3xl border border-white/10 bg-[oklch(0.09_0.005_20)] shadow-2xl"
+          className="relative w-full max-w-[390px] sm:max-w-md overflow-hidden rounded-2xl sm:rounded-3xl border border-white/10 bg-[oklch(0.09_0.005_20)] shadow-2xl max-h-[92svh] flex flex-col"
         >
           {/* Header */}
-          <div className="relative flex items-start justify-between border-b border-white/8 bg-white/[0.02] px-7 py-6">
+          <div className="relative flex items-start justify-between border-b border-white/8 bg-white/[0.02] px-5 py-4 sm:px-7 sm:py-5 shrink-0">
             <div>
               <div className="mb-1 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-0.5 text-[10px] uppercase tracking-[0.2em] text-primary">
                 <Zap className="h-2.5 w-2.5" /> Plano {label}
               </div>
-              <h2 className="font-display text-2xl tracking-tight text-white">
+              <h2 className="font-display text-xl sm:text-2xl tracking-tight text-white">
                 Finalizar matrícula
               </h2>
-              <p className="mt-0.5 text-sm text-white/50">
+              <p className="mt-0.5 text-xs sm:text-sm text-white/50">
                 R${" "}
-                <span className="font-display text-xl font-bold text-white">{price}</span>
+                <span className="font-display text-lg sm:text-xl font-bold text-white">{price}</span>
                 /mês · Cancele quando quiser
               </p>
             </div>
@@ -100,7 +100,7 @@ export default function PaymentModal({ plan, onClose }: PaymentSectionProps) {
           </div>
 
           {/* Tabs */}
-          <div className="flex border-b border-white/8 bg-white/[0.01]">
+          <div className="flex border-b border-white/8 bg-white/[0.01] shrink-0">
             {(["pix", "paypal"] as const).map((t) => (
               <button
                 key={t}
@@ -125,7 +125,7 @@ export default function PaymentModal({ plan, onClose }: PaymentSectionProps) {
           </div>
 
           {/* Content */}
-          <div className="px-7 py-7">
+          <div className="px-5 py-5 sm:px-7 sm:py-6 overflow-y-auto flex-1 scrollbar-none">
             {tab === "pix" ? (
               <PixTab price={price} plan={plan} />
             ) : (
@@ -134,7 +134,7 @@ export default function PaymentModal({ plan, onClose }: PaymentSectionProps) {
           </div>
 
           {/* Footer trust */}
-          <div className="flex items-center justify-center gap-3 border-t border-white/5 px-7 py-4 text-[11px] text-white/30">
+          <div className="flex items-center justify-center gap-3 border-t border-white/5 px-5 py-3 sm:px-7 sm:py-4 text-[10px] sm:text-[11px] text-white/30 shrink-0">
             <Lock className="h-3 w-3 shrink-0" />
             Pagamento 100% seguro · Dados criptografados
             <Shield className="h-3 w-3 shrink-0" />
@@ -208,43 +208,43 @@ function PixTab({ price, plan }: { price: number; plan: PlanKey }) {
   }
 
   return (
-    <div className="space-y-5">
-      <p className="text-center text-sm text-white/60">
+    <div className="space-y-3">
+      <p className="text-center text-[11px] sm:text-sm text-white/60">
         Escaneie o QR Code ou copie o código PIX e pague direto pelo seu banco.
       </p>
 
       {/* QR Code */}
-      <div className="mx-auto w-fit rounded-2xl bg-white p-4 shadow-xl shadow-white/5">
+      <div className="mx-auto w-fit rounded-xl bg-white p-2 sm:p-3 shadow-xl shadow-white/5">
         <QRCode
           value={pixPayload}
-          size={190}
+          size={120}
           level="M"
           style={{ display: "block" }}
         />
       </div>
 
       {/* Valor */}
-      <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-center">
-        <p className="text-xs uppercase tracking-[0.2em] text-white/40">Valor</p>
-        <p className="font-display text-3xl text-white">
-          R$ {price.toLocaleString("pt-BR")}<span className="text-sm text-white/40">/mês</span>
+      <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-1.5 sm:px-3.5 sm:py-2.5 text-center">
+        <p className="text-[10px] sm:text-xs uppercase tracking-[0.2em] text-white/40">Valor</p>
+        <p className="font-display text-xl sm:text-3xl text-white">
+          R$ {price.toLocaleString("pt-BR")}<span className="text-xs sm:text-sm text-white/40">/mês</span>
         </p>
       </div>
 
       {/* Chave PIX copiável */}
       <div>
-        <p className="mb-2 text-xs uppercase tracking-[0.18em] text-white/40">
+        <p className="mb-1 text-[10px] sm:text-xs uppercase tracking-[0.18em] text-white/40">
           Chave PIX ({siteConfig.pix.keyType})
         </p>
         <button
           onClick={copyKey}
-          className="flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white/80 transition-colors hover:border-primary/30 hover:bg-primary/5"
+          className="flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/[0.04] px-3 py-1.5 sm:px-3.5 sm:py-2.5 text-xs sm:text-sm text-white/80 transition-colors hover:border-primary/30 hover:bg-primary/5"
         >
-          <span className="font-mono">{siteConfig.pix.key}</span>
+          <span className="font-mono text-xs sm:text-sm">{siteConfig.pix.key}</span>
           {copied ? (
-            <CheckCircle2 className="h-4 w-4 text-green-400" />
+            <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-green-400" />
           ) : (
-            <Copy className="h-4 w-4 text-white/40" />
+            <Copy className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-white/40" />
           )}
         </button>
       </div>
@@ -252,32 +252,38 @@ function PixTab({ price, plan }: { price: number; plan: PlanKey }) {
       {/* Copiar código completo */}
       <button
         onClick={copyPayload}
-        className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.02] px-4 py-2.5 text-xs text-white/50 transition-colors hover:border-white/20 hover:text-white/70"
+        className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.02] px-3 py-1.5 sm:px-4 sm:py-2 text-[10px] sm:text-xs text-white/50 transition-colors hover:border-white/20 hover:text-white/70"
       >
         <Copy className="h-3 w-3" />
         {copied ? "Copiado!" : "Copiar código Pix Copia e Cola"}
       </button>
 
       {/* Instructions */}
-      <ol className="space-y-2 rounded-xl border border-white/8 bg-white/[0.02] p-4 text-xs text-white/50">
-        {[
-          "Abra o app do seu banco",
-          "Escolha pagar com PIX",
-          "Escaneie o QR Code ou cole a chave",
-          "Confirme o pagamento de R$ " + price,
-        ].map((step, i) => (
-          <li key={i} className="flex items-start gap-2">
-            <span className="grid h-4 w-4 shrink-0 place-items-center rounded-full bg-primary/20 text-[10px] font-bold text-primary">
-              {i + 1}
-            </span>
-            {step}
-          </li>
-        ))}
-      </ol>
+      <details className="group rounded-xl border border-white/8 bg-white/[0.02] p-2.5 text-[10px] sm:text-xs text-white/50 cursor-pointer">
+        <summary className="list-none flex items-center justify-between font-semibold select-none text-[11px] sm:text-xs text-white/70 hover:text-white transition-colors">
+          <span>❓ Como pagar? (Passo a passo)</span>
+          <span className="text-white/40 transition-transform group-open:rotate-180">↓</span>
+        </summary>
+        <ol className="mt-2 space-y-1.5 pl-1">
+          {[
+            "Abra o app do seu banco",
+            "Escolha pagar com PIX",
+            "Escaneie o QR Code ou cole a chave",
+            "Confirme o pagamento de R$ " + price,
+          ].map((step, i) => (
+            <li key={i} className="flex items-start gap-2">
+              <span className="grid h-4 w-4 shrink-0 place-items-center rounded-full bg-primary/20 text-[9px] font-bold text-primary">
+                {i + 1}
+              </span>
+              {step}
+            </li>
+          ))}
+        </ol>
+      </details>
 
       <button
         onClick={() => setStep("success")}
-        className="w-full rounded-full gradient-ember py-3 text-sm font-semibold text-white ember-glow hover:opacity-90 transition-opacity"
+        className="w-full rounded-full gradient-ember py-2.5 sm:py-3 text-xs sm:text-sm font-semibold text-white ember-glow hover:opacity-90 transition-opacity"
       >
         Já realizei o pagamento ✓
       </button>
@@ -387,20 +393,20 @@ function PayPalTab({ price, plan }: { price: number; plan: PlanKey }) {
 
   return (
     <div className="space-y-4">
-      <p className="text-center text-sm text-white/60">
+      <p className="text-center text-xs sm:text-sm text-white/60">
         Pague com sua conta PayPal ou cartão de crédito/débito.
       </p>
 
-      <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-center">
+      <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3.5 py-2.5 text-center">
         <p className="text-xs uppercase tracking-[0.2em] text-white/40">Total</p>
-        <p className="font-display text-3xl text-white">
+        <p className="font-display text-2xl sm:text-3xl text-white">
           R$ {price}<span className="text-sm text-white/40">/mês</span>
         </p>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-white/10 bg-white p-3">
+      <div className="overflow-hidden rounded-xl border border-white/10 bg-white p-2.5 sm:p-3">
         {!paypalReady && (
-          <div className="flex items-center justify-center gap-2 py-6 text-sm text-gray-400">
+          <div className="flex items-center justify-center gap-2 py-4 text-xs sm:text-sm text-gray-400">
             <Loader2 className="h-4 w-4 animate-spin" /> Carregando PayPal...
           </div>
         )}
@@ -413,7 +419,7 @@ function PayPalTab({ price, plan }: { price: number; plan: PlanKey }) {
           }}
         >
           <PayPalButtons
-            style={{ layout: "vertical", label: "pay", shape: "pill", height: 48 }}
+            style={{ layout: "vertical", label: "pay", shape: "pill", height: 40 }}
             onInit={() => setPaypalReady(true)}
             createOrder={createOrder}
             onApprove={onApprove}

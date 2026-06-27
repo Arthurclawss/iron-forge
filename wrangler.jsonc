@@ -21,9 +21,11 @@
   },
 
   "vars": {
-    "SUPABASE_URL": "https://ydshptsbmjuvoqnyfbrp.supabase.co",
-    "SUPABASE_PUBLISHABLE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlkc2hwdHNibWp1dm9xbnlmYnJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MTExMzcsImV4cCI6MjA5NzM4NzEzN30.9trqKQMPjQL5oTyWNN8QETlh16vP4yNjTrb-f9809qA",
-    "LEADS_TOKEN": "ironforge_crm_secret_2026"
+    "SUPABASE_URL": "https://npwrccsyqqxznwumslck.supabase.co",
+    "SUPABASE_PUBLISHABLE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5wd3JjY3N5cXF4em53dW1zbGNrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1NzkwMDEsImV4cCI6MjA5ODE1NTAwMX0.9hWfS9yDXIL5cyIITvUCKJtO3gzXk0FOjlx4fRv707U",
+    "SUPABASE_SERVICE_ROLE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5wd3JjY3N5cXF4em53dW1zbGNrIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MjU3OTAwMSwiZXhwIjoyMDk4MTU1MDAxfQ.QLnUuhJ99PArsxf92Jiv1eghT1oyQu2HmKKtPB1FEcQ",
+    "LEADS_TOKEN": "ironforge_crm_secret_2026",
+    "GOOGLE_SHEETS_WEBHOOK_URL": "https://script.google.com/macros/s/AKfycbzDOnwp-4UhxJu3Q55lapzm0dCbTlzKSCSVSx7ORCJd_ohQbYAZfiCr8JGT3FskLdr1/exec"
   }
 }
 

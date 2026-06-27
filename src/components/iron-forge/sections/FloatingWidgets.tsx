@@ -18,7 +18,6 @@ export default function FloatingWidgets({ prefersReducedMotion }: FloatingWidget
       <ExitIntentPopup />
       <SocialProofToast />
       <FloatingCTA />
-      <MoltenFlowLine prefersReducedMotion={prefersReducedMotion} />
     </>
   );
 }
@@ -249,38 +248,4 @@ function FloatingCTA() {
   );
 }
 
-/* ───────────────────── Molten Flow Line (Fio de Aço) ───────────────────── */
-interface MoltenFlowLineProps {
-  prefersReducedMotion: boolean;
-}
 
-function MoltenFlowLine({ prefersReducedMotion }: MoltenFlowLineProps) {
-  const { scrollYProgress } = useScroll();
-  const scaleY = useSpring(scrollYProgress, { stiffness: 90, damping: 22, restDelta: 0.001 });
-  const tipPercent = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
-
-  if (prefersReducedMotion) return null;
-
-  return (
-    <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-[2px] pointer-events-none z-10 hidden lg:block overflow-hidden">
-      {/* Track */}
-      <div className="absolute inset-y-0 left-0 w-full bg-white/[0.04]" />
-      
-      {/* Flow Line */}
-      <motion.div
-        className="absolute top-0 left-0 w-full origin-top bg-gradient-to-b from-primary/80 via-primary to-orange-500 shadow-[0_0_12px_#ff4500,0_0_24px_#ff4500]"
-        style={{ height: useTransform(scaleY, [0, 1], ["0%", "100%"]) }}
-      />
-      
-      {/* Glowing tip */}
-      <motion.div
-        className="absolute left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-white -mt-2 shadow-[0_0_15px_#ff7f50,0_0_30px_#ff4500,0_0_45px_#ff4500] mix-blend-screen"
-        style={{
-          top: tipPercent,
-        }}
-      >
-        <span className="absolute inset-0 rounded-full animate-ping bg-primary/80 opacity-75" />
-      </motion.div>
-    </div>
-  );
-}

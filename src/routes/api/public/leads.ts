@@ -127,42 +127,51 @@ export const Route = createFileRoute("/api/public/leads")({
 
         console.log(`[leads] Lead registrado: ID=${leadId}, Nome=${data.name}, Email=${data.email}`);
 
-        // Dispara e-mail, alertas de Discord e Telegram de forma assíncrona
-        void dispatchNotifications({
-          id: leadId,
-          name: data.name,
-          email: data.email,
-          phone: phoneNormalized,
-          goal: data.goal,
-          notes: data.notes,
-          bestContactTime: data.bestContactTime,
-          source: data.source,
-          utm_source: data.utm_source,
-          utm_medium: data.utm_medium,
-          utm_campaign: data.utm_campaign,
-        }).catch((e) => console.error("[leads] Falha no disparo de notificações:", e));
+        // Dispara e-mail, alertas de Discord e Telegram
+        try {
+          await dispatchNotifications({
+            id: leadId,
+            name: data.name,
+            email: data.email,
+            phone: phoneNormalized,
+            goal: data.goal,
+            notes: data.notes,
+            bestContactTime: data.bestContactTime,
+            source: data.source,
+            utm_source: data.utm_source,
+            utm_medium: data.utm_medium,
+            utm_campaign: data.utm_campaign,
+          });
+        } catch (e) {
+          console.error("[leads] Falha no disparo de notificações:", e);
+        }
 
-        // Fire-and-forget: Google Sheets via Apps Script webhook (opcional)
+        // Webhook para Google Sheets (opcional)
         const sheetsUrl = process.env.GOOGLE_SHEETS_WEBHOOK_URL;
         if (sheetsUrl) {
-          void fetch(sheetsUrl, {
-            method: "POST",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify({
-              id: leadId,
-              created_at: new Date().toISOString(),
-              name: data.name,
-              email: data.email,
-              phone: phoneNormalized,
-              goal: data.goal,
-              notes: data.notes ?? "",
-              best_contact_time: data.bestContactTime ?? "",
-              source: data.source ?? "direct",
-              utm_source: data.utm_source ?? "",
-              utm_medium: data.utm_medium ?? "",
-              utm_campaign: data.utm_campaign ?? "",
-            }),
-          }).catch((e) => console.error("[leads] sheets webhook failed", e));
+          try {
+            const sheetsRes = await fetch(sheetsUrl, {
+              method: "POST",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({
+                id: leadId,
+                created_at: new Date().toISOString(),
+                name: data.name,
+                email: data.email,
+                phone: phoneNormalized,
+                goal: data.goal,
+                notes: data.notes ?? "",
+                best_contact_time: data.bestContactTime ?? "",
+                source: data.source ?? "direct",
+                utm_source: data.utm_source ?? "",
+                utm_medium: data.utm_medium ?? "",
+                utm_campaign: data.utm_campaign ?? "",
+              }),
+            });
+            console.log("[leads] Google Sheets webhook enviado. Status:", sheetsRes.status);
+          } catch (e) {
+            console.error("[leads] sheets webhook failed", e);
+          }
         }
 
         return Response.json({ ok: true, leadId: leadId }, { status: 200 });

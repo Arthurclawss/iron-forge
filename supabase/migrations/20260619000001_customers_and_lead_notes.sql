@@ -27,7 +27,7 @@ CREATE TABLE public.customers (
   -- Endereço (opcional)
   address_street  TEXT,
   address_city    TEXT,
-  address_state   TEXT(2),
+  address_state   VARCHAR(2),
   address_zip     TEXT,
 
   -- Saúde / treino

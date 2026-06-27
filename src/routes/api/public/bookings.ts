@@ -120,19 +120,24 @@ export const Route = createFileRoute("/api/public/bookings")({
         // 4. Dispara o webhook em tempo real para a planilha do Google Sheets (opcional)
         const sheetsUrl = process.env.GOOGLE_SHEETS_WEBHOOK_URL;
         if (sheetsUrl) {
-          void fetch(sheetsUrl, {
-            method: "POST",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify({
-              event: "booking",
-              id: data.leadId,
-              email: leadData.email,
-              phone: leadData.phone,
-              name: leadData.name,
-              booking_time: bookingFormatted,
-              notes: data.notes || "",
-            }),
-          }).catch((e) => console.error("[bookings] sheets webhook failed", e));
+          try {
+            const sheetsRes = await fetch(sheetsUrl, {
+              method: "POST",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({
+                event: "booking",
+                id: data.leadId,
+                email: leadData.email,
+                phone: leadData.phone,
+                name: leadData.name,
+                booking_time: bookingFormatted,
+                notes: data.notes || "",
+              }),
+            });
+            console.log("[bookings] Google Sheets webhook enviado. Status:", sheetsRes.status);
+          } catch (e) {
+            console.error("[bookings] sheets webhook failed", e);
+          }
         }
 
         // 5. Decisão de retorno baseado nos resultados do banco

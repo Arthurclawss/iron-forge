@@ -171,9 +171,9 @@ export default function FitnessCalculator({ onSelectPlan }: FitnessCalculatorPro
   };
 
   return (
-    <section id="cadastro" className="relative py-28 md:py-36 border-t border-white/5 bg-[oklch(0.10_0.005_20)]">
-      <div className="mx-auto max-w-5xl px-5 md:px-8">
-        <div className="mx-auto max-w-3xl text-center mb-16">
+    <section id="cadastro" className="relative py-16 sm:py-24 md:py-36 border-t border-white/5 bg-[oklch(0.10_0.005_20)]">
+      <div className="mx-auto max-w-5xl px-4 sm:px-6 md:px-8">
+        <div className="mx-auto max-w-3xl text-center mb-8 sm:mb-12 md:mb-16">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-[11px] uppercase tracking-[0.25em] text-primary">
             <Calculator className="h-3.5 w-3.5" />
             Ferramenta Interativa
@@ -181,12 +181,12 @@ export default function FitnessCalculator({ onSelectPlan }: FitnessCalculatorPro
           <h2 className="font-display text-balance text-[clamp(2rem,5vw,4rem)] leading-[1] tracking-tight">
             Calcule sua <span className="gradient-text-ember">Meta Fitness</span>
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-pretty text-white/60 text-sm">
+          <p className="mx-auto mt-4 max-w-xl text-pretty text-white/60 text-xs sm:text-sm">
             Descubra suas necessidades calóricas e obtenha um direcionamento personalizado da nossa equipe.
           </p>
         </div>
 
-        <div className="overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.04] to-transparent p-6 md:p-10 backdrop-blur-xl">
+        <div className="overflow-hidden rounded-2xl sm:rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.04] to-transparent p-4 sm:p-6 md:p-10 backdrop-blur-xl">
           <AnimatePresence mode="wait">
             {/* ETAPA 1: INPUT DOS PARAMETROS */}
             {step === "input" && (
@@ -201,13 +201,13 @@ export default function FitnessCalculator({ onSelectPlan }: FitnessCalculatorPro
                 <div className="space-y-4">
                   <h3 className="font-semibold text-lg text-white">Parâmetros Corporais</h3>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4">
                     <label className="grid gap-1.5">
                       <span className="text-xs uppercase tracking-wider text-white/50">Gênero</span>
                       <select
                         value={calcData.gender}
                         onChange={(e) => setCalcData({ ...calcData, gender: e.target.value as any })}
-                        className="rounded-lg border border-white/10 bg-white/[0.03] px-3 h-11 text-sm text-white outline-none focus:border-primary cursor-pointer"
+                        className="w-full rounded-lg border border-white/10 bg-white/[0.03] px-3 h-11 text-base sm:text-sm text-white outline-none focus:border-primary cursor-pointer"
                       >
                         <option value="masculino" className="bg-[oklch(0.12_0.005_20)]">Masculino</option>
                         <option value="feminino" className="bg-[oklch(0.12_0.005_20)]">Feminino</option>
@@ -224,7 +224,7 @@ export default function FitnessCalculator({ onSelectPlan }: FitnessCalculatorPro
                         max={100}
                         value={calcData.age}
                         onChange={(e) => setCalcData({ ...calcData, age: Number(e.target.value) })}
-                        className="rounded-lg border border-white/10 bg-white/[0.03] px-3 h-11 text-sm text-white outline-none focus:border-primary"
+                        className="w-full rounded-lg border border-white/10 bg-white/[0.03] px-3 h-11 text-base sm:text-sm text-white outline-none focus:border-primary"
                       />
                     </label>
 
@@ -238,7 +238,7 @@ export default function FitnessCalculator({ onSelectPlan }: FitnessCalculatorPro
                         max={180}
                         value={calcData.weight}
                         onChange={(e) => setCalcData({ ...calcData, weight: Number(e.target.value) })}
-                        className="rounded-lg border border-white/10 bg-white/[0.03] px-3 h-11 text-sm text-white outline-none focus:border-primary"
+                        className="w-full rounded-lg border border-white/10 bg-white/[0.03] px-3 h-11 text-base sm:text-sm text-white outline-none focus:border-primary"
                       />
                     </label>
 
@@ -252,7 +252,7 @@ export default function FitnessCalculator({ onSelectPlan }: FitnessCalculatorPro
                         max={220}
                         value={calcData.height}
                         onChange={(e) => setCalcData({ ...calcData, height: Number(e.target.value) })}
-                        className="rounded-lg border border-white/10 bg-white/[0.03] px-3 h-11 text-sm text-white outline-none focus:border-primary"
+                        className="w-full rounded-lg border border-white/10 bg-white/[0.03] px-3 h-11 text-base sm:text-sm text-white outline-none focus:border-primary"
                       />
                     </label>
                   </div>
@@ -261,18 +261,18 @@ export default function FitnessCalculator({ onSelectPlan }: FitnessCalculatorPro
                 <div className="space-y-4 flex flex-col justify-between">
                   <div>
                     <h3 className="font-semibold text-lg text-white mb-4">Nível de Atividade & Objetivo</h3>
-                             <label className="grid gap-1.5 mb-4">
+                             <label className="grid gap-1.5 mb-4 w-full">
                       <span className="text-xs uppercase tracking-wider text-white/50">Nível de Atividade</span>
                       <select
                         value={calcData.activity}
                         onChange={(e) => setCalcData({ ...calcData, activity: Number(e.target.value) })}
-                        className="rounded-lg border border-white/10 bg-white/[0.03] px-3 h-11 text-sm text-white outline-none focus:border-primary cursor-pointer"
+                        className="w-full max-w-full rounded-lg border border-white/10 bg-white/[0.03] px-3 h-11 text-base sm:text-sm text-white outline-none focus:border-primary cursor-pointer"
                       >
-                        <option value={1.2} className="bg-[oklch(0.12_0.005_20)]">Sedentário (pouco ou nenhum exercício)</option>
-                        <option value={1.375} className="bg-[oklch(0.12_0.005_20)]">Levemente ativo (exercício 1-3 dias/semana)</option>
-                        <option value={1.55} className="bg-[oklch(0.12_0.005_20)]">Moderadamente ativo (exercício 3-5 dias/semana)</option>
-                        <option value={1.725} className="bg-[oklch(0.12_0.005_20)]">Altamente ativo (exercício pesado diário)</option>
-                        <option value={1.9} className="bg-[oklch(0.12_0.005_20)]">Extremamente ativo (atleta/trabalho físico pesado)</option>
+                        <option value={1.2} className="bg-[oklch(0.12_0.005_20)]">Sedentário (sem exercícios)</option>
+                        <option value={1.375} className="bg-[oklch(0.12_0.005_20)]">Leve (exercício 1-3 dias/sem)</option>
+                        <option value={1.55} className="bg-[oklch(0.12_0.005_20)]">Moderado (exercício 3-5 dias/sem)</option>
+                        <option value={1.725} className="bg-[oklch(0.12_0.005_20)]">Intenso (treino pesado diário)</option>
+                        <option value={1.9} className="bg-[oklch(0.12_0.005_20)]">Atleta (treino pesado diário + trabalho)</option>
                       </select>
                     </label>
 
@@ -327,11 +327,13 @@ export default function FitnessCalculator({ onSelectPlan }: FitnessCalculatorPro
                   Preencha o contato abaixo para desbloquear seu IMC, taxa metabólica, sugestões de macros e receber seu plano experimental.
                 </p>
 
-                <form onSubmit={handleSubmit(onSubmitLead)} className="mt-6 grid gap-4 text-left">
-                  {/* Honeypot */}
-                  <div className="absolute -left-[9999px] top-auto h-0 w-0 overflow-hidden" aria-hidden>
-                    <input type="text" tabIndex={-1} {...register("website")} />
-                  </div>
+                <form 
+                  onSubmit={handleSubmit(
+                    onSubmitLead, 
+                    (errors) => console.warn("[FitnessCalculator] Form validation failed:", errors)
+                  )} 
+                  className="mt-6 grid gap-4 text-left"
+                >
 
                   <label className="grid gap-1">
                     <span className="text-xs uppercase tracking-wider text-white/50">Nome Completo</span>
@@ -340,7 +342,7 @@ export default function FitnessCalculator({ onSelectPlan }: FitnessCalculatorPro
                       type="text"
                       required
                       placeholder="Seu nome"
-                      className="rounded-lg border border-white/10 bg-white/[0.03] px-3.5 h-11 text-sm text-white outline-none focus:border-primary"
+                      className="rounded-lg border border-white/10 bg-white/[0.03] px-3.5 h-11 text-base sm:text-sm text-white outline-none focus:border-primary"
                     />
                     {errors.name && <span className="text-xs text-red-400 mt-1">{errors.name.message}</span>}
                   </label>
@@ -353,7 +355,7 @@ export default function FitnessCalculator({ onSelectPlan }: FitnessCalculatorPro
                       inputMode="tel"
                       required
                       placeholder="(84) 99999-9999"
-                      className="rounded-lg border border-white/10 bg-white/[0.03] px-3.5 h-11 text-sm text-white outline-none focus:border-primary"
+                      className="rounded-lg border border-white/10 bg-white/[0.03] px-3.5 h-11 text-base sm:text-sm text-white outline-none focus:border-primary"
                     />
                     {errors.phone && <span className="text-xs text-red-400 mt-1">{errors.phone.message}</span>}
                   </label>
@@ -366,7 +368,7 @@ export default function FitnessCalculator({ onSelectPlan }: FitnessCalculatorPro
                       inputMode="email"
                       required
                       placeholder="exemplo@email.com"
-                      className="rounded-lg border border-white/10 bg-white/[0.03] px-3.5 h-11 text-sm text-white outline-none focus:border-primary"
+                      className="rounded-lg border border-white/10 bg-white/[0.03] px-3.5 h-11 text-base sm:text-sm text-white outline-none focus:border-primary"
                     />
                     {errors.email && <span className="text-xs text-red-400 mt-1">{errors.email.message}</span>}
                   </label>
@@ -416,32 +418,32 @@ export default function FitnessCalculator({ onSelectPlan }: FitnessCalculatorPro
                   </div>
                   <h3 className="font-display text-3xl tracking-tight text-white mt-2">Suas Métricas Calculadas</h3>
                   
-                  <div className="mt-6 grid grid-cols-2 gap-4">
-                    <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4 text-center">
-                      <p className="text-xs uppercase tracking-wider text-white/45">Seu IMC</p>
-                      <p className="text-3xl font-display text-white mt-2">{results.bmi}</p>
-                      <span className="inline-block mt-1 text-[11px] rounded-full bg-primary/10 text-primary px-2.5 py-0.5">
+                  <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-4">
+                    <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3 sm:p-4 text-center">
+                      <p className="text-[10px] sm:text-xs uppercase tracking-wider text-white/45">Seu IMC</p>
+                      <p className="text-2xl sm:text-3xl font-display text-white mt-1.5 sm:mt-2">{results.bmi}</p>
+                      <span className="inline-block mt-1 text-[10px] sm:text-[11px] rounded-full bg-primary/10 text-primary px-2 py-0.5">
                         {results.bmiCategory}
                       </span>
                     </div>
 
-                    <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4 text-center">
-                      <p className="text-xs uppercase tracking-wider text-white/45">Calorias Recomendadas</p>
-                      <p className="text-3xl font-display text-primary mt-2">{results.targetCalories}</p>
-                      <span className="text-[10px] text-white/40 block mt-1">kcal/dia para {calcData.goal}</span>
+                    <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3 sm:p-4 text-center">
+                      <p className="text-[10px] sm:text-xs uppercase tracking-wider text-white/45">Calorias Sugeridas</p>
+                      <p className="text-2xl sm:text-3xl font-display text-primary mt-1.5 sm:mt-2">{results.targetCalories}</p>
+                      <span className="text-[9px] sm:text-[10px] text-white/40 block mt-1">kcal/dia</span>
                     </div>
                   </div>
 
-                  <div className="mt-6 space-y-3.5">
-                    <div className="flex items-center justify-between text-sm">
+                  <div className="mt-6 space-y-3">
+                    <div className="flex items-center justify-between text-xs sm:text-sm">
                       <span className="text-white/60">Gasto Calórico Diário (TDEE):</span>
                       <strong className="text-white">{results.tdee} kcal</strong>
                     </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-white/60">Metabolismo Basal (TMB estimado):</span>
+                    <div className="flex items-center justify-between text-xs sm:text-sm">
+                      <span className="text-white/60">Metabolismo Basal (TMB):</span>
                       <strong className="text-white">{Math.round(results.targetCalories * 0.75)} kcal</strong>
                     </div>
-                    <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center justify-between text-xs sm:text-sm">
                       <span className="text-white/60">Foco do Plano de Treino:</span>
                       <strong className="text-primary">{goalLabels[calcData.goal as keyof typeof goalLabels]}</strong>
                     </div>
@@ -456,25 +458,25 @@ export default function FitnessCalculator({ onSelectPlan }: FitnessCalculatorPro
                     </a>
                     <button
                       onClick={handleReset}
-                      className="flex items-center justify-center gap-2 rounded-full border border-white/10 px-5 min-h-[44px] h-11 text-xs text-white/80 hover:bg-white/5 focus:outline-none cursor-pointer"
+                      className="flex items-center justify-center gap-2 rounded-full border border-white/10 px-4 sm:px-5 min-h-[44px] h-11 text-xs text-white/80 hover:bg-white/5 focus:outline-none cursor-pointer"
                     >
                       <RefreshCw className="h-3.5 w-3.5" /> Refazer
                     </button>
                   </div>
                 </div>
 
-                <div className="flex flex-col items-center justify-center rounded-2xl border border-white/5 bg-white/[0.01] p-6 text-center">
+                <div className="flex flex-col items-center justify-center rounded-2xl border border-white/5 bg-white/[0.01] p-4 sm:p-6 text-center">
                   <p className="text-xs uppercase tracking-wider text-white/50 mb-2">Divisão de Macronutrientes</p>
                   
-                  <div className="h-56 w-full relative">
+                  <div className="h-44 sm:h-56 w-full relative">
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie
                           data={results.macros}
                           cx="50%"
                           cy="50%"
-                          innerRadius={60}
-                          outerRadius={80}
+                          innerRadius={50}
+                          outerRadius={70}
                           paddingAngle={5}
                           dataKey="value"
                         >

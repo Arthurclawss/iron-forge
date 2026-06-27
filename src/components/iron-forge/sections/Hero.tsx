@@ -168,12 +168,7 @@ export default function Hero({ prefersReducedMotion }: HeroProps) {
         style={{ background: spotBg }}
       />
 
-      {/* moving light rays */}
-      <motion.div
-        aria-hidden
-        className="pointer-events-none absolute -top-40 left-1/2 -z-10 h-[140%] w-[800px] -translate-x-1/2 opacity-40 mix-blend-screen"
-        style={{ x: glowX, y: glowY, background: "conic-gradient(from 200deg at 50% 0%, transparent 0deg, oklch(0.62 0.24 22 / 0.5) 30deg, transparent 80deg)" }}
-      />
+
 
       {/* embers */}
       {!prefersReducedMotion && <Embers />}

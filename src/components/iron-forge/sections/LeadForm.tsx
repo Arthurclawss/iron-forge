@@ -144,23 +144,14 @@ export default function LeadForm({ onSelectPlan }: LeadFormProps) {
 
   return (
     <form
-      onSubmit={handleSubmit(onSubmit)}
+      onSubmit={handleSubmit(
+        onSubmit,
+        (errors) => console.warn("[LeadForm] Form validation failed:", errors)
+      )}
       noValidate
       className="relative grid gap-4"
       aria-label="Formulário de cadastro Iron Forge"
     >
-      {/* Honeypot — escondido para humanos */}
-      <div className="absolute -left-[9999px] top-auto h-0 w-0 overflow-hidden" aria-hidden>
-        <label>
-          Não preencha este campo
-          <input
-            type="text"
-            tabIndex={-1}
-            autoComplete="off"
-            {...register("website")}
-          />
-        </label>
-      </div>
 
       <Field label="Nome completo" error={errors.name?.message}>
         <input
@@ -295,7 +286,7 @@ function Field({
 
 function inputCls(hasError: boolean) {
   return [
-    "w-full rounded-lg border bg-white/[0.03] px-4 py-3 text-sm text-white placeholder:text-white/30",
+    "w-full rounded-lg border bg-white/[0.03] px-4 py-3 text-base sm:text-sm text-white placeholder:text-white/30",
     "outline-none transition-colors focus:border-primary focus:bg-white/[0.05]",
     hasError ? "border-red-500/50" : "border-white/10",
   ].join(" ");
