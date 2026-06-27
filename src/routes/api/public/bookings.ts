@@ -85,7 +85,7 @@ export const Route = createFileRoute("/api/public/bookings")({
         });
 
         // 2. Tenta inserir na tabela 'bookings' de forma nativa
-        const bookingId = randomUUID();
+        const bookingId = globalThis.crypto.randomUUID();
         const { error: insertError } = await supabase
           .from("bookings")
           .insert({

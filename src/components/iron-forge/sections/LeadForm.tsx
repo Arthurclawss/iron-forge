@@ -8,6 +8,8 @@ import confetti from "canvas-confetti";
 import { leadFormSchema, type LeadFormInput, LEAD_GOALS, goalLabels } from "@/lib/leads.schema";
 import { captureUtmParams, trackEvent } from "@/lib/analytics";
 import { siteConfig, buildWhatsAppUrl } from "../../../../config/site";
+import { Calendar } from "@/components/ui/calendar";
+import { ptBR } from "date-fns/locale";
 
 function maskPhone(value: string): string {
   const d = value.replace(/\D/g, "").slice(0, 11);
@@ -25,13 +27,16 @@ function fireConfetti() {
 
 export default function LeadForm() {
   const [submitting, setSubmitting] = useState(false);
-  const [success, setSuccess] = useState<null | { 
-    id: string | null;
+  const [step, setStep] = useState<"form" | "scheduler" | "success">("form");
+  const [leadInfo, setLeadInfo] = useState<{
+    id: string;
     name: string;
     email: string;
     phone: string;
     notes?: string;
-  }>(null);
+  } | null>(null);
+  const [bookingDate, setBookingDate] = useState<Date | undefined>(undefined);
+  const [bookingTime, setBookingTime] = useState<string | undefined>(undefined);
   const [serverError, setServerError] = useState<string | null>(null);
 
   const {
@@ -73,15 +78,22 @@ export default function LeadForm() {
         setServerError(json.error ?? "Não foi possível enviar. Tente novamente.");
         return;
       }
-      setSuccess({ 
-        id: json.leadId ?? null,
+      
+      const newLeadId = json.leadId ?? globalThis.crypto.randomUUID();
+      setLeadInfo({
+        id: newLeadId,
         name: values.name,
         email: values.email,
         phone: values.phone,
         notes: values.notes
       });
-      trackEvent("lead_success", { leadId: json.leadId });
-      fireConfetti();
+      trackEvent("lead_success", { leadId: newLeadId });
+      
+      if (json.leadId) {
+        setStep("scheduler");
+      } else {
+        setStep("success");
+      }
     } catch (e) {
       console.error(e);
       setServerError("Falha de conexão. Tente novamente.");
@@ -90,14 +102,34 @@ export default function LeadForm() {
     }
   };
 
-  if (success) {
+  if (step === "scheduler" && leadInfo) {
+    return (
+      <SchedulerStep
+        leadId={leadInfo.id}
+        leadName={leadInfo.name}
+        leadEmail={leadInfo.email}
+        leadPhone={leadInfo.phone}
+        onComplete={(date, time) => {
+          setBookingDate(date);
+          setBookingTime(time);
+          setStep("success");
+          fireConfetti();
+        }}
+        onBack={() => setStep("form")}
+      />
+    );
+  }
+
+  if (step === "success" && leadInfo) {
     return (
       <SuccessScreen 
-        leadId={success.id} 
-        leadName={success.name}
-        leadEmail={success.email}
-        leadPhone={success.phone}
-        leadNotes={success.notes}
+        leadId={leadInfo.id} 
+        leadName={leadInfo.name}
+        leadEmail={leadInfo.email}
+        leadPhone={leadInfo.phone}
+        leadNotes={leadInfo.notes}
+        bookingDate={bookingDate}
+        bookingTime={bookingTime}
       />
     );
   }
@@ -263,19 +295,31 @@ function inputCls(hasError: boolean) {
 
 function SuccessScreen({ 
   leadName,
+  bookingDate,
+  bookingTime,
 }: { 
   leadId: string | null;
   leadName: string;
   leadEmail: string;
   leadPhone: string;
   leadNotes?: string;
+  bookingDate?: Date;
+  bookingTime?: string;
 }) {
-  const whatsAppUrl = buildWhatsAppUrl(`Olá! Acabei de me cadastrar no site. Meu nome é ${leadName}. Gostaria de agendar minha aula experimental com a IA!`);
+  const formattedDate = bookingDate 
+    ? bookingDate.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" })
+    : "";
+  
+  const textMsg = bookingDate && bookingTime
+    ? `Olá! Acabei de me cadastrar no site e agendei minha aula experimental na Iron Forge para o dia ${formattedDate} às ${bookingTime}. Gostaria de confirmar!`
+    : `Olá! Acabei de me cadastrar no site. Meu nome é ${leadName}. Gostaria de agendar minha aula experimental com a IA!`;
+
+  const whatsAppUrl = buildWhatsAppUrl(textMsg);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       window.location.href = whatsAppUrl;
-    }, 2000);
+    }, 4500);
     return () => clearTimeout(timer);
   }, [whatsAppUrl]);
 
@@ -285,24 +329,205 @@ function SuccessScreen({
       animate={{ opacity: 1, y: 0 }}
       className="grid place-items-center gap-5 p-6 text-center"
     >
-      <div className="grid h-16 w-16 place-items-center rounded-full gradient-ember ember-glow">
+      <div className="grid h-16 w-16 place-items-center rounded-full gradient-ember ember-glow animate-float-slow">
         <CheckCircle2 className="h-8 w-8 text-white" />
       </div>
       <div>
-        <h3 className="font-display text-2xl tracking-tight text-white">Cadastro Recebido! 🎉</h3>
-        <p className="mx-auto mt-2 max-w-sm text-sm text-white/65">
-          Olá <strong>{leadName}</strong>, seu cadastro foi registrado com sucesso.
-        </p>
+        <h3 className="font-display text-2xl tracking-tight text-white">Treino Reservado! 🎉</h3>
+        {bookingDate && bookingTime ? (
+          <p className="mx-auto mt-2 max-w-sm text-sm text-white/65">
+            Olá <strong>{leadName}</strong>, seu horário foi pré-agendado para o dia{" "}
+            <strong className="text-primary">{formattedDate}</strong> às <strong className="text-primary">{bookingTime}</strong>.
+          </p>
+        ) : (
+          <p className="mx-auto mt-2 max-w-sm text-sm text-white/65">
+            Olá <strong>{leadName}</strong>, seu cadastro foi registrado com sucesso.
+          </p>
+        )}
         <p className="mx-auto mt-4 max-w-sm text-xs text-primary animate-pulse font-semibold">
-          Redirecionando para o WhatsApp em instantes para agendar seu treino com nossa IA...
+          Redirecionando para o WhatsApp para confirmar o seu agendamento...
         </p>
       </div>
       <a
         href={whatsAppUrl}
         className="mt-2 inline-flex items-center justify-center gap-2 rounded-full bg-[#25D366] px-8 py-3.5 text-sm font-semibold text-black shadow-lg shadow-emerald-500/20 transition-all hover:scale-[1.01]"
       >
-        <MessageCircle className="h-4 w-4" /> Falar com a IA no WhatsApp Agora
+        <MessageCircle className="h-4 w-4" /> Confirmar no WhatsApp Agora
       </a>
     </motion.div>
+  );
+}
+
+interface SchedulerStepProps {
+  leadId: string;
+  leadName: string;
+  leadEmail: string;
+  leadPhone: string;
+  onComplete: (date: Date, time: string) => void;
+  onBack: () => void;
+}
+
+function SchedulerStep({
+  leadId,
+  leadName,
+  leadEmail,
+  leadPhone,
+  onComplete,
+  onBack,
+}: SchedulerStepProps) {
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(() => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow;
+  });
+  const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const getSlotsForDate = (date?: Date) => {
+    if (!date) return [];
+    const day = date.getDay(); // 0 = Domingo, 6 = Sábado
+    if (day === 0) { // Domingo (8h - 14h)
+      return ["09:00", "10:30", "12:00", "13:00"];
+    }
+    if (day === 6) { // Sábado (7h - 20h)
+      return ["08:00", "10:00", "12:00", "14:00", "16:00", "18:00"];
+    }
+    // Dias úteis (5h - 23h)
+    return ["07:00", "09:00", "11:00", "13:00", "15:00", "17:00", "19:00", "21:00"];
+  };
+
+  const timeSlots = getSlotsForDate(selectedDate);
+
+  const handleConfirm = async () => {
+    if (!selectedDate || !selectedTime) {
+      setError("Selecione um dia e horário.");
+      return;
+    }
+    setError(null);
+    setSubmitting(true);
+
+    try {
+      const [hours, minutes] = selectedTime.split(":");
+      const bookingTime = new Date(selectedDate);
+      bookingTime.setHours(Number(hours), Number(minutes), 0, 0);
+
+      const res = await fetch("/api/public/bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          leadId,
+          bookingTime: bookingTime.toISOString(),
+          name: leadName,
+          email: leadEmail,
+          phone: leadPhone,
+        }),
+      });
+
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok && !json.ok) {
+        setError(json.error ?? "Erro ao realizar agendamento.");
+        setSubmitting(false);
+        return;
+      }
+
+      onComplete(selectedDate, selectedTime);
+    } catch (err) {
+      console.error(err);
+      setError("Falha de conexão. Tente novamente.");
+      setSubmitting(false);
+    }
+  };
+
+  const isPastDate = (date: Date) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return date < today;
+  };
+
+  return (
+    <div className="space-y-6 text-center animate-fade-in">
+      <div>
+        <span className="text-[10px] uppercase tracking-[0.25em] text-primary font-bold">ETAPA 2 DE 2</span>
+        <h3 className="font-display text-2xl tracking-tight text-white mt-1">
+          Agende seu <span className="gradient-text-ember">treino experimental</span>
+        </h3>
+        <p className="text-xs text-white/55 mt-1">Selecione uma data e horário de sua preferência</p>
+      </div>
+
+      <div className="flex flex-col items-center justify-center rounded-2xl border border-white/8 bg-white/[0.01] p-3 backdrop-blur-sm">
+        <Calendar
+          mode="single"
+          selected={selectedDate}
+          onSelect={(date) => {
+            setSelectedDate(date);
+            setSelectedTime(null);
+          }}
+          locale={ptBR}
+          disabled={isPastDate}
+          className="rounded-xl border border-white/5 bg-black/30 p-2 text-white"
+        />
+      </div>
+
+      {selectedDate && (
+        <div className="space-y-3">
+          <p className="text-left text-xs uppercase tracking-[0.18em] text-white/40 font-semibold">
+            Horários disponíveis:
+          </p>
+          <div className="grid grid-cols-4 gap-2">
+            {timeSlots.map((time) => {
+              const active = selectedTime === time;
+              return (
+                <button
+                  key={time}
+                  type="button"
+                  onClick={() => setSelectedTime(time)}
+                  className={`rounded-lg border py-2 text-xs font-semibold transition-all ${
+                    active
+                      ? "border-primary bg-primary/15 text-primary"
+                      : "border-white/10 text-white/70 hover:border-white/20 hover:bg-white/5"
+                  }`}
+                >
+                  {time}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {error && (
+        <p className="rounded-md border border-red-500/20 bg-red-500/10 px-3 py-2 text-xs text-red-300">
+          {error}
+        </p>
+      )}
+
+      <div className="flex gap-3 pt-2">
+        <button
+          type="button"
+          onClick={onBack}
+          disabled={submitting}
+          className="flex-1 rounded-full border border-white/15 py-3 text-xs font-semibold text-white/60 hover:bg-white/5 transition-colors disabled:opacity-55"
+        >
+          Voltar
+        </button>
+        <button
+          type="button"
+          onClick={handleConfirm}
+          disabled={submitting || !selectedDate || !selectedTime}
+          className="flex-[2] inline-flex items-center justify-center gap-2 rounded-full gradient-ember py-3 text-xs font-semibold text-white ember-glow disabled:opacity-55 transition-opacity"
+        >
+          {submitting ? (
+            <>
+              <Loader2 className="h-3.5 w-3.5 animate-spin" /> Agendando...
+            </>
+          ) : (
+            <>
+              Confirmar Agendamento <ArrowRight className="h-3.5 w-3.5" />
+            </>
+          )}
+        </button>
+      </div>
+    </div>
   );
 }
